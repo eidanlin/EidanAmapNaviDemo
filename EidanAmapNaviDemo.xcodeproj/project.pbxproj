@@ -1,0 +1,402 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2D03CEF80427266C448CD104 /* libPods-EidanAmapNaviDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */; };
+		D98F9C4F1E28C1560040F730 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C4E1E28C1560040F730 /* main.m */; };
+		D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C511E28C1560040F730 /* AppDelegate.m */; };
+		D98F9C551E28C1560040F730 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C541E28C1560040F730 /* ViewController.m */; };
+		D98F9C581E28C1560040F730 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D98F9C561E28C1560040F730 /* Main.storyboard */; };
+		D98F9C5A1E28C1560040F730 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D98F9C591E28C1560040F730 /* Assets.xcassets */; };
+		D98F9C5D1E28C1560040F730 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D98F9C5B1E28C1560040F730 /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EidanAmapNaviDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C693C2E0B15C7B330BA94A1F /* Pods-EidanAmapNaviDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EidanAmapNaviDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo.release.xcconfig"; sourceTree = "<group>"; };
+		D185E0EC1439789FDFDB0276 /* Pods-EidanAmapNaviDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EidanAmapNaviDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EidanAmapNaviDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D98F9C4E1E28C1560040F730 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D98F9C501E28C1560040F730 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		D98F9C511E28C1560040F730 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		D98F9C531E28C1560040F730 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		D98F9C541E28C1560040F730 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		D98F9C571E28C1560040F730 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D98F9C591E28C1560040F730 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D98F9C5C1E28C1560040F730 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D98F9C5E1E28C1560040F730 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D98F9C471E28C1560040F730 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D03CEF80427266C448CD104 /* libPods-EidanAmapNaviDemo.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2CC3D106C1E41673306B54F0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		71BC035D0492BC6B060B44EE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D185E0EC1439789FDFDB0276 /* Pods-EidanAmapNaviDemo.debug.xcconfig */,
+				C693C2E0B15C7B330BA94A1F /* Pods-EidanAmapNaviDemo.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		D98F9C411E28C1560040F730 = {
+			isa = PBXGroup;
+			children = (
+				D98F9C4C1E28C1560040F730 /* EidanAmapNaviDemo */,
+				D98F9C4B1E28C1560040F730 /* Products */,
+				71BC035D0492BC6B060B44EE /* Pods */,
+				2CC3D106C1E41673306B54F0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		D98F9C4B1E28C1560040F730 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D98F9C4C1E28C1560040F730 /* EidanAmapNaviDemo */ = {
+			isa = PBXGroup;
+			children = (
+				D98F9C501E28C1560040F730 /* AppDelegate.h */,
+				D98F9C511E28C1560040F730 /* AppDelegate.m */,
+				D98F9C531E28C1560040F730 /* ViewController.h */,
+				D98F9C541E28C1560040F730 /* ViewController.m */,
+				D98F9C561E28C1560040F730 /* Main.storyboard */,
+				D98F9C591E28C1560040F730 /* Assets.xcassets */,
+				D98F9C5B1E28C1560040F730 /* LaunchScreen.storyboard */,
+				D98F9C5E1E28C1560040F730 /* Info.plist */,
+				D98F9C4D1E28C1560040F730 /* Supporting Files */,
+			);
+			path = EidanAmapNaviDemo;
+			sourceTree = "<group>";
+		};
+		D98F9C4D1E28C1560040F730 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D98F9C4E1E28C1560040F730 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D98F9C491E28C1560040F730 /* EidanAmapNaviDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D98F9C611E28C1560040F730 /* Build configuration list for PBXNativeTarget "EidanAmapNaviDemo" */;
+			buildPhases = (
+				6C7D7AD71D94CCAB4D8949EE /* [CP] Check Pods Manifest.lock */,
+				D98F9C461E28C1560040F730 /* Sources */,
+				D98F9C471E28C1560040F730 /* Frameworks */,
+				D98F9C481E28C1560040F730 /* Resources */,
+				4D1DC25AE3184CD4C2C767FA /* [CP] Embed Pods Frameworks */,
+				9F651F0D2DBE1B89BDF47199 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EidanAmapNaviDemo;
+			productName = EidanAmapNaviDemo;
+			productReference = D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D98F9C421E28C1560040F730 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = Amap;
+				TargetAttributes = {
+					D98F9C491E28C1560040F730 = {
+						CreatedOnToolsVersion = 8.2;
+						DevelopmentTeam = YMJ372W38W;
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = D98F9C451E28C1560040F730 /* Build configuration list for PBXProject "EidanAmapNaviDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D98F9C411E28C1560040F730;
+			productRefGroup = D98F9C4B1E28C1560040F730 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D98F9C491E28C1560040F730 /* EidanAmapNaviDemo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D98F9C481E28C1560040F730 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D98F9C5D1E28C1560040F730 /* LaunchScreen.storyboard in Resources */,
+				D98F9C5A1E28C1560040F730 /* Assets.xcassets in Resources */,
+				D98F9C581E28C1560040F730 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4D1DC25AE3184CD4C2C767FA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6C7D7AD71D94CCAB4D8949EE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		9F651F0D2DBE1B89BDF47199 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D98F9C461E28C1560040F730 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D98F9C551E28C1560040F730 /* ViewController.m in Sources */,
+				D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */,
+				D98F9C4F1E28C1560040F730 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D98F9C561E28C1560040F730 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D98F9C571E28C1560040F730 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D98F9C5B1E28C1560040F730 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D98F9C5C1E28C1560040F730 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D98F9C5F1E28C1560040F730 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D98F9C601E28C1560040F730 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D98F9C621E28C1560040F730 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D185E0EC1439789FDFDB0276 /* Pods-EidanAmapNaviDemo.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = EidanAmapNaviDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.autonavi.EidanAmapNaviDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8014ae4e-33b6-4937-87e3-3725a2aad4f7";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatform_development;
+			};
+			name = Debug;
+		};
+		D98F9C631E28C1560040F730 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C693C2E0B15C7B330BA94A1F /* Pods-EidanAmapNaviDemo.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEVELOPMENT_TEAM = YMJ372W38W;
+				INFOPLIST_FILE = EidanAmapNaviDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.autonavi.EidanAmapNaviDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "a892512d-fe94-4702-b716-0b66880b936d";
+				PROVISIONING_PROFILE_SPECIFIER = openPlatformInhouse;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D98F9C451E28C1560040F730 /* Build configuration list for PBXProject "EidanAmapNaviDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D98F9C5F1E28C1560040F730 /* Debug */,
+				D98F9C601E28C1560040F730 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D98F9C611E28C1560040F730 /* Build configuration list for PBXNativeTarget "EidanAmapNaviDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D98F9C621E28C1560040F730 /* Debug */,
+				D98F9C631E28C1560040F730 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D98F9C421E28C1560040F730 /* Project object */;
+}

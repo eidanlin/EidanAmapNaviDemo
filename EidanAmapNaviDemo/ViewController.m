@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "NaviTestViewController.h"
 
 @interface ViewController ()
 
@@ -23,6 +24,13 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)doSomething:(id)sender {
+    
+    NaviTestViewController *vc = [[NaviTestViewController alloc] initWithNibName:@"NaviTestViewController" bundle:nil];
+    [self.navigationController pushViewController:vc animated:YES];
+    
 }
 
 

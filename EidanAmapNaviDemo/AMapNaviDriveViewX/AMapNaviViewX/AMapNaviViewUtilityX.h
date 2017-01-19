@@ -13,6 +13,8 @@
 
 + (double)calcDistanceBetweenPoint:(AMapNaviPoint *)pointA andPoint:(AMapNaviPoint *)pointB;
 
++ (AMapNaviPoint *)calcPointWithStartPoint:(AMapNaviPoint *)start endPoint:(AMapNaviPoint *)end rate:(double)rate;
+
 #pragma mark - NormailzedDegree
 
 + (double)normalizeDegree:(double)degree;

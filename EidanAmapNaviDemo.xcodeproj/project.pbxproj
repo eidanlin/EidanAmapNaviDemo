@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2D03CEF80427266C448CD104 /* libPods-EidanAmapNaviDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */; };
+		D93C940E1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C940D1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m */; };
+		D93C94111E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */; };
+		D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */; };
 		D98F9C4F1E28C1560040F730 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C4E1E28C1560040F730 /* main.m */; };
 		D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C511E28C1560040F730 /* AppDelegate.m */; };
 		D98F9C551E28C1560040F730 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C541E28C1560040F730 /* ViewController.m */; };
@@ -384,6 +387,12 @@
 		1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EidanAmapNaviDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C693C2E0B15C7B330BA94A1F /* Pods-EidanAmapNaviDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EidanAmapNaviDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo.release.xcconfig"; sourceTree = "<group>"; };
 		D185E0EC1439789FDFDB0276 /* Pods-EidanAmapNaviDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EidanAmapNaviDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EidanAmapNaviDemo/Pods-EidanAmapNaviDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		D93C940C1E2E4F05003152CD /* AMapNaviRouteAnnotationX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationX.h; sourceTree = "<group>"; };
+		D93C940D1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationX.m; sourceTree = "<group>"; };
+		D93C940F1E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationViewX.h; sourceTree = "<group>"; };
+		D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationViewX.m; sourceTree = "<group>"; };
+		D93C94151E2F1F89003152CD /* AMapNaviRoutePolylineX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRoutePolylineX.h; sourceTree = "<group>"; };
+		D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRoutePolylineX.m; sourceTree = "<group>"; };
 		D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EidanAmapNaviDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D98F9C4E1E28C1560040F730 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D98F9C501E28C1560040F730 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1266,6 +1275,12 @@
 				D98F9F451E28D8BC0040F730 /* AMapNaviCarAnnotationX.m */,
 				D98F9F411E28D6490040F730 /* AMapNaviCarAnnotationViewX.h */,
 				D98F9F421E28D6490040F730 /* AMapNaviCarAnnotationViewX.m */,
+				D93C940C1E2E4F05003152CD /* AMapNaviRouteAnnotationX.h */,
+				D93C940D1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m */,
+				D93C940F1E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.h */,
+				D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */,
+				D93C94151E2F1F89003152CD /* AMapNaviRoutePolylineX.h */,
+				D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */,
 			);
 			path = AMapNaviMapX;
 			sourceTree = "<group>";
@@ -1763,9 +1778,12 @@
 				D98F9F431E28D6490040F730 /* AMapNaviCarAnnotationViewX.m in Sources */,
 				D98F9F461E28D8BC0040F730 /* AMapNaviCarAnnotationX.m in Sources */,
 				D98F9C671E28C4330040F730 /* NaviTestViewController.m in Sources */,
+				D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */,
 				D98F9C551E28C1560040F730 /* ViewController.m in Sources */,
 				D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */,
 				D98F9C6C1E28C6520040F730 /* AMapNaviDriveViewX.m in Sources */,
+				D93C940E1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m in Sources */,
+				D93C94111E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m in Sources */,
 				D98F9F3F1E28CF670040F730 /* SpeechSynthesizer.m in Sources */,
 				D98F9F4A1E28EAB70040F730 /* AMapNaviViewUtilityX.m in Sources */,
 				D98F9C4F1E28C1560040F730 /* main.m in Sources */,

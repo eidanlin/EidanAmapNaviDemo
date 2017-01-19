@@ -26,4 +26,30 @@
     return MAMetersBetweenMapPoints(mapPointA, mapPointB);
 }
 
++ (AMapNaviPoint *)calcPointWithStartPoint:(AMapNaviPoint *)start endPoint:(AMapNaviPoint *)end rate:(double)rate {
+    if (rate > 1.0 || rate < 0)
+    {
+        return nil;
+    }
+    
+    MAMapPoint from = [self convertNaviPointToMapPoint:start];
+    MAMapPoint to = [self convertNaviPointToMapPoint:end];
+    
+    double latitudeDelta = (to.y - from.y) * rate;
+    double longitudeDelta = (to.x - from.x) * rate;
+    
+    MAMapPoint newPoint = MAMapPointMake(from.x + longitudeDelta, from.y + latitudeDelta);
+    
+    return [self convertMapPointToNaviPoint:newPoint];
+}
+
++ (AMapNaviPoint *)convertMapPointToNaviPoint:(MAMapPoint)mapPoint {
+    CLLocationCoordinate2D coordinate = MACoordinateForMapPoint(mapPoint);
+    return [AMapNaviPoint locationWithLatitude:coordinate.latitude longitude:coordinate.longitude];
+}
+
++ (MAMapPoint)convertNaviPointToMapPoint:(AMapNaviPoint *)point {
+    return MAMapPointForCoordinate(CLLocationCoordinate2DMake(point.latitude, point.longitude));
+}
+
 @end

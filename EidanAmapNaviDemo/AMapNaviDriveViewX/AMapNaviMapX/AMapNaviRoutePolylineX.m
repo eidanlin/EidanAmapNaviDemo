@@ -13,7 +13,7 @@
 @end
 
 
-@implementation AMapNaviRoutePolylineX
 
+@implementation AMapNaviRoutePolylineX
 
 @end

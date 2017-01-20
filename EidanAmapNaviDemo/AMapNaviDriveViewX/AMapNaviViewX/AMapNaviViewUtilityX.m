@@ -12,6 +12,48 @@
 
 @implementation AMapNaviViewUtilityX
 
+#pragma mark - NormailzedString
+
++ (NSString *)normalizedRemainDistance:(NSInteger)remainDistance {
+    if (remainDistance < 0) {
+        return nil;
+    }
+    
+    if (remainDistance >= 1000) {
+        CGFloat kiloMeter = remainDistance / 1000.0;
+        
+        if (remainDistance % 1000 >= 100) {
+            kiloMeter -= 0.05f;
+            return [NSString stringWithFormat:@"%.1f公里", kiloMeter];
+        } else {
+            return [NSString stringWithFormat:@"%.0f公里", kiloMeter];
+        }
+    } else {
+        return [NSString stringWithFormat:@"%ld米", (long)remainDistance];
+    }
+}
+
++ (NSString *)normalizedRemainTime:(NSInteger)remainTime {
+    if (remainTime < 0) {
+        return nil;
+    }
+    
+    if (remainTime < 60) {
+        return [NSString stringWithFormat:@"< 1分钟"];
+    } else if (remainTime >= 60 && remainTime < 60*60) {
+        return [NSString stringWithFormat:@"%ld分钟", (long)remainTime/60];
+    } else {
+        NSInteger hours = remainTime / 60 / 60;
+        NSInteger minute = remainTime / 60 % 60;
+        if (minute == 0) {
+            return [NSString stringWithFormat:@"%ld小时", (long)hours];
+        } else {
+            return [NSString stringWithFormat:@"%ld小时%ld分钟", (long)hours, (long)minute];
+        }
+    }
+}
+
+
 #pragma mark - NormailzedDegree
 
 + (double)normalizeDegree:(double)degree {

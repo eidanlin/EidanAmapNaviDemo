@@ -10,10 +10,8 @@
 
 @implementation AMapNaviCarAnnotationX
 
-- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self = [super init])
-    {
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
         self.coordinate = coordinate;
     }
     return self;

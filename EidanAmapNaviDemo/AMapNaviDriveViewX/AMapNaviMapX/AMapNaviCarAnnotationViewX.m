@@ -22,8 +22,7 @@
 @implementation AMapNaviCarAnnotationViewX
 
 - (id)initWithAnnotation:(id<MAAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier {
-    if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier])
-    {
+    if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor clearColor];
         self.userInteractionEnabled = NO;
         
@@ -35,16 +34,13 @@
 
 - (void)buildCarAnnotationView {
     
-//    [self initProperties];
-    
     self.carDirection = 0;
     
     [self addSubview:self.compassImageView];
     [self addSubview:self.carImageView];
 }
 
-- (UIImageView *)carImageView
-{
+- (UIImageView *)carImageView {
     if (_carImageView == nil)
     {
         UIImage *carImage = [UIImage imageNamed:kCarAnnotationViewCarImage];
@@ -57,8 +53,7 @@
     return _carImageView;
 }
 
-- (UIImageView *)compassImageView
-{
+- (UIImageView *)compassImageView {
     if (_compassImageView == nil)
     {
         UIImage *compassImage = [UIImage imageNamed:kCarAnnotationViewCompassImage];
@@ -80,8 +75,7 @@
     [self updateCameraDegree];
 }
 
-- (void)setCompassDirection:(double)compassDirection
-{
+- (void)setCompassDirection:(double)compassDirection {
     _compassDirection = [AMapNaviViewUtilityX normalizeDegree:compassDirection];
     
     double compassRadians = (_compassDirection - [[self mapView] rotationDegree]) / 180.f * M_PI;

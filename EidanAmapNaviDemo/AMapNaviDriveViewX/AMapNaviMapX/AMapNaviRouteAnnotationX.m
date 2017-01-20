@@ -10,10 +10,8 @@
 
 @implementation AMapNaviCameraAnnotationX
 
-- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self = [super init])
-    {
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
         self.coordinate = coordinate;
     }
     return self;
@@ -23,10 +21,8 @@
 
 @implementation AMapNaviStartPointAnnotationX
 
-- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self = [super init])
-    {
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
         self.coordinate = coordinate;
     }
     return self;
@@ -36,10 +32,8 @@
 
 @implementation AMapNaviWayPointAnnotationX
 
-- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self = [super init])
-    {
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
         self.coordinate = coordinate;
     }
     return self;
@@ -49,10 +43,8 @@
 
 @implementation AMapNaviEndPointAnnotationX
 
-- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    if (self = [super init])
-    {
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
         self.coordinate = coordinate;
     }
     return self;

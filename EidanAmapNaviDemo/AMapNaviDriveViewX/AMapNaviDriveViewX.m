@@ -32,12 +32,11 @@
 
 #define kAMapNaviRoutePolylineDefaultWidth      15.0f  //显示规划的路径的默认宽度
 
+//views
+#define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
+#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:40/255.0 green:44/255.0 blue:55/255.0 alpha:0.85]
+
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
-
-@property (nonatomic, strong) IBOutlet UIView *customView;
-
-//mapView
-@property (nonatomic, weak) IBOutlet MAMapView *internalMapView;
 
 //interface
 
@@ -78,8 +77,38 @@
 @property (nonatomic, copy) AMapNaviRoute *currentNaviRoute;  //当前需要导航的的一整条路径的信息，开始导航后，就不再改变
 @property (nonatomic, copy) NSArray <AMapNaviTrafficStatus *> *trafficStatus;  //前方交通路况信息(长度和拥堵情况)
 
+#pragma -mark xib views
+@property (nonatomic, strong) IBOutlet UIView *customView;
+
+//mapView
+@property (nonatomic, weak) IBOutlet MAMapView *internalMapView;
+
+//路口放大图相关
+@property (nonatomic, weak) IBOutlet UIImageView *crossImageView;
+
+//车道信息图
+@property (nonatomic, weak) IBOutlet UIImageView *laneInfoView;
+
+//topInfoView
+@property (nonatomic, weak) IBOutlet UIView *topInfoView;
+@property (nonatomic, weak) IBOutlet UIImageView *topTurnImageView;
+@property (nonatomic, weak) IBOutlet UIImageView *topTurnSmallImageView;
+@property (nonatomic, weak) IBOutlet UILabel *topTurnRemainLabel;
+@property (nonatomic, weak) IBOutlet UILabel *topRoadLabel;
+
 //bottomInfoView
 @property (nonatomic, weak) IBOutlet UIView *bottomInfoView;
+@property (nonatomic, weak) IBOutlet UIView *bottomRemainBgView;
+@property (nonatomic, weak) IBOutlet UILabel *bottomRemainTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
+
+//leftTipsView
+@property (nonatomic, weak) IBOutlet UIView *leftCameraInfoView;
+@property (nonatomic, weak) IBOutlet UIImageView *leftCameraInfoImageView;
+@property (nonatomic, weak) IBOutlet UIView *leftSpeedInfoView;
+@property (nonatomic, weak) IBOutlet UILabel *leftSpeedInfoLabel;
+
+
 
 
 @end
@@ -113,12 +142,25 @@
     
     [self initProperties];
     
+    //corssImageView
+    [self configureCrossImageView];
+    
+    //laneInfoView
+    [self configureLaneInfoView];
+    
+    //topInfoView
+    [self configureTopInfoView];
+    
     //bottomInfoView
     [self configureBottomInfoView];
+    
+    //leftInfoView
+    [self configureLeftCameraAndSpeedView];
     
     //mapView
     [self configureMapView];
     
+    //timer
     [self startMoveCarTimer];
     
 }
@@ -282,6 +324,11 @@
     
     self.currentNaviInfo = naviInfo;
     
+    //InfoView
+    [self updateTopInfoView];
+    [self updateBottomInfoView];
+    [self updateLeftCameraAndSpeedView];
+    
     //每路过一个电子眼后，“导航信息更新”这个回调就会被触发调用一次，cameraIndex也会不一样，就需要更新电子眼信息。
     if (isNeedUpdateCamera) {
         [self updateRouteCameraAnnotationWithStartIndex:self.currentNaviInfo.cameraIndex];
@@ -319,7 +366,7 @@
     }
 }
 
-//自车位置更新。模拟导航自车位置不更新，GPS导航自车位置才更新
+//自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviLocation:(AMapNaviLocation *)naviLocation {
     NSLog(@"自车位置更新");
     
@@ -330,17 +377,54 @@
     }
 }
 
-//路况信息更新,
+//路况信息更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateTrafficStatus:(NSArray<AMapNaviTrafficStatus *> *)trafficStatus {
     NSLog(@"路况信息更新");
     
     self.trafficStatus = trafficStatus;
     
     if (self.showTrafficLayer) { //需要显示带路况
-        
         [self updateRoutePolyline]; //如果路况信息更新了，带拥堵情况路径也要重新画，有了路况信息，才能画带路况的。
-        
     }
+}
+
+//需要显示路口放大图了
+- (void)driveManager:(AMapNaviDriveManager *)driveManager showCrossImage:(UIImage *)crossImage {
+    NSLog(@"需要显示路口放大图了");
+    
+    if (crossImage) {
+        self.crossImageView.image = crossImage;
+        self.crossImageView.hidden = NO;
+    }
+    
+}
+
+//需要把路口放大图了隐藏了
+- (void)driveManagerHideCrossImage:(AMapNaviDriveManager *)driveManager {
+    NSLog(@"需要把路口放大图了隐藏了");
+    
+    self.crossImageView.image = nil;
+    self.crossImageView.hidden = YES;
+    
+}
+
+//需要显示车道信息了
+- (void)driveManager:(AMapNaviDriveManager *)driveManager showLaneBackInfo:(NSString *)laneBackInfo laneSelectInfo:(NSString *)laneSelectInfo {
+    NSLog(@"需要显示车道信息");
+    
+    UIImage *image = CreateLaneInfoImageWithLaneInfo(laneBackInfo, laneSelectInfo);
+    if (image) {
+        self.laneInfoView.image = image;
+        self.laneInfoView.hidden = NO;
+    }
+}
+
+//需要隐藏车道信息
+- (void)driveManagerHideLaneInfo:(AMapNaviDriveManager *)driveManager {
+    NSLog(@"需要隐藏车道信息");
+    
+    self.laneInfoView.image = nil;
+    self.laneInfoView.hidden = YES;
 }
 
 
@@ -395,10 +479,98 @@
     [self.internalMapView removeAnnotations:self.internalMapView.annotations];
 }
 
+#pragma -mark 路口放大图 
+
+- (void)configureCrossImageView {
+    self.crossImageView.hidden = YES;
+}
+
+#pragma -mark 车道信息图 
+
+- (void)configureLaneInfoView {
+    self.laneInfoView.hidden = YES;
+}
+
+#pragma -mark topInfoView
+
+- (void)configureTopInfoView {
+    self.topInfoView.superview.backgroundColor = kAMapNaviInfoViewBackgroundColor;
+    self.topInfoView.hidden = YES;
+}
+
+- (void)updateTopInfoView {
+    if (self.currentNaviInfo) {
+        
+        self.topTurnRemainLabel.text = [NSString stringWithFormat:@"%@后",[AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.segmentRemainDistance]];
+        self.topRoadLabel.text = self.currentNaviInfo.nextRoadName;
+        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,self.currentNaviInfo.iconType]];
+        if (image == nil) {
+            image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,AMapNaviIconTypeStraight]];
+        }
+        self.topTurnImageView.image = image;
+        self.topTurnSmallImageView.image = image;
+        
+        if (self.topInfoView.hidden == YES) {
+            self.topInfoView.hidden = NO;
+        }
+    } else {
+        if (self.topInfoView.hidden == NO) {
+            self.topInfoView.hidden = YES;
+        }
+    }
+}
+
 #pragma -mark bottomInfoView
 
 - (void)configureBottomInfoView {
-    self.bottomInfoView.backgroundColor = [UIColor colorWithRed:40/255.0 green:44/255.0 blue:55/255.0 alpha:0.85];
+    self.bottomInfoView.backgroundColor = kAMapNaviInfoViewBackgroundColor;
+    self.bottomRemainBgView.hidden = YES;
+}
+
+- (void)updateBottomInfoView {
+    if (self.currentNaviInfo) {
+        
+        self.bottomRemainTimeLabel.text = [AMapNaviViewUtilityX normalizedRemainTime:self.currentNaviInfo.routeRemainTime];
+        self.bottomRemainDistanceLabel.text = [AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.routeRemainDistance];
+        
+        if (self.bottomRemainBgView.hidden == YES) {
+            self.bottomRemainBgView.hidden = NO;
+        }
+    } else {
+        
+        if (self.bottomRemainBgView.hidden == NO) {
+            self.bottomRemainBgView.hidden = YES;
+        }
+        
+    }
+}
+
+#pragma -mark LeftCameraAndSpeedView
+
+- (void)configureLeftCameraAndSpeedView {
+    self.leftSpeedInfoView.hidden = self.leftCameraInfoView.hidden = YES;
+}
+
+
+- (void)updateLeftCameraAndSpeedView {
+    
+    //限速也是电子眼信息中的
+    if (self.currentNaviInfo.cameraDistance > 0) {
+        
+        if (self.currentNaviInfo.cameraType == 0 && self.currentNaviInfo.cameraLimitSpeed > 0) {  //cameraType 0为测速摄像头，且有限速
+            self.leftSpeedInfoLabel.text = [NSString stringWithFormat:@"%ld",(long)self.currentNaviInfo.cameraLimitSpeed];
+            self.leftSpeedInfoView.hidden = NO;
+            self.leftCameraInfoView.hidden = YES;
+        } else if (self.currentNaviInfo.cameraType >= 1) {  //监控摄像头
+            NSString *imageName = self.currentNaviInfo.cameraType == 1 ? @"default_navi_camera" : @"default_navi_camera_content_normal";
+            self.leftCameraInfoImageView.image = [UIImage imageNamed:imageName];
+            self.leftSpeedInfoView.hidden = YES;
+            self.leftCameraInfoView.hidden = NO;
+        }
+        
+    } else {  //电子眼距离(<=0 为没有电子眼或距离很远)
+        self.leftCameraInfoView.hidden = self.leftSpeedInfoView.hidden = YES;
+    }
 }
 
 #pragma -mark xib btns click

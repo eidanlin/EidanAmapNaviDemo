@@ -1913,6 +1913,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "8014ae4e-33b6-4937-87e3-3725a2aad4f7";
 				PROVISIONING_PROFILE_SPECIFIER = openPlatform_development;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1930,6 +1931,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "a892512d-fe94-4702-b716-0b66880b936d";
 				PROVISIONING_PROFILE_SPECIFIER = openPlatformInhouse;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

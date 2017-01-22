@@ -110,6 +110,9 @@
 
 
 
+//Constraint
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeight;
+
 
 @end
 
@@ -140,6 +143,10 @@
     [self addSubview:self.customView];
     self.customView.frame = self.bounds;
     
+    //layoutConstraint
+    [self configureTheConstraint];
+    
+    //property
     [self initProperties];
     
     //corssImageView
@@ -162,6 +169,22 @@
     
     //timer
     [self startMoveCarTimer];
+    
+}
+
+//layoutConstraint
+- (void)configureTheConstraint{
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {  //pad
+        self.topInfoViewHeight.constant = 220;
+    } else {
+        float height = [UIScreen mainScreen].bounds.size.height;
+        if (height == 667) {  //iphone7
+            self.topInfoViewHeight.constant = 162.5;
+        } else if (height == 736) {
+            self.topInfoViewHeight.constant = 182;
+        }
+    }
     
 }
 

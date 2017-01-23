@@ -98,7 +98,7 @@
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager playNaviSoundString:(NSString *)soundString soundStringType:(AMapNaviSoundType)soundStringType
 {
-    NSLog(@"playNaviSoundString:{%ld:%@}", (long)soundStringType, soundString);
+//    NSLog(@"playNaviSoundString:{%ld:%@}", (long)soundStringType, soundString);
     
     [[SpeechSynthesizer sharedSpeechSynthesizer] speakString:soundString];
 }

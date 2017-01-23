@@ -11,7 +11,5 @@
 
 @interface AMapNaviDriveViewX : UIView <AMapNaviDriveDataRepresentable>
 
-///锁车状态下地图cameraDegree, 默认30.0, 范围[0,60]
-@property (nonatomic, assign) CGFloat cameraDegree;
 
 @end

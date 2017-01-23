@@ -46,6 +46,15 @@
 ///是否显示实时交通图层,默认YES
 @property (nonatomic, assign) BOOL showTrafficLayer;
 
+///锁车状态下地图cameraDegree, 默认30.0, 范围[0,60]
+@property (nonatomic, assign) CGFloat cameraDegree;
+
+///导航界面显示模式,默认AMapNaviDriveViewShowModeCarPositionLocked
+@property (nonatomic, assign) AMapNaviDriveViewShowMode showMode;  //不管什么模式，车一直都是在运动的，区分的只有地图的状态
+
+//跟随模式：地图朝北，车头朝北
+@property (nonatomic, assign) AMapNaviViewTrackingMode trackingMode;  //其实更改跟随模式，只在lockCarPosition为YES，即锁车显示模式才有效果，此时地图的状态是跟着变的，而如果showMode为其他显示模式，地图不跟着动，就无所谓怎么跟随了
+
 //private
 @property (nonatomic, assign) BOOL lockCarPosition;  //车相对屏幕的位置是否不改变，YES代表不改变，车永远在屏幕中间，那么就需要移动地图中心点，NO代表改变，不需要改变地图中心点.
 
@@ -101,13 +110,14 @@
 @property (nonatomic, weak) IBOutlet UIView *bottomRemainBgView;
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
+@property (nonatomic, weak) IBOutlet UIView *bottomContinueNaviBgView;
+
 
 //leftTipsView
 @property (nonatomic, weak) IBOutlet UIView *leftCameraInfoView;
 @property (nonatomic, weak) IBOutlet UIImageView *leftCameraInfoImageView;
 @property (nonatomic, weak) IBOutlet UIView *leftSpeedInfoView;
 @property (nonatomic, weak) IBOutlet UILabel *leftSpeedInfoLabel;
-
 
 
 //Constraint
@@ -117,6 +127,7 @@
 @end
 
 @implementation AMapNaviDriveViewX
+
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -175,6 +186,7 @@
 //layoutConstraint
 - (void)configureTheConstraint{
     
+    //竖屏下，根据机型，改变topInfoView的高度
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {  //pad
         self.topInfoViewHeight.constant = 220;
     } else {
@@ -193,10 +205,12 @@
     //public
     self.lineWidth = kAMapNaviRoutePolylineDefaultWidth;
     self.showTrafficLayer = YES;
+    self.trackingMode = AMapNaviViewTrackingModeMapNorth;
+    self.showMode = AMapNaviRideViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
     
+    //car and map move
     self.splitCount = kAMapNaviMoveCarSplitCount;
     self.cameraDegree = kAMapNaviLockStateCameraDegree;
-    
     self.needMoving = NO;
     self.moveDirectly = YES;
     
@@ -208,6 +222,63 @@
 - (void)layoutSubviews {
     self.customView.frame = self.bounds;
 }
+
+#pragma -mark 显示模式改变
+
+//点击地图范围内，切换成普通模式
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    if (self.currentNaviRoute == nil) {   //没有路径信息，就证明还没开始导航
+        return;
+    }
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint point = [touch locationInView:self];
+    
+    CGRect frame = self.internalMapView.frame;
+    if (CGRectContainsRect(self.internalMapView.frame, self.bottomInfoView.frame)) { //地图有包含底部，证明是竖屏，要扣掉，横屏的话，没人遮挡地图，就不用处理
+        frame = UIEdgeInsetsInsetRect(self.internalMapView.frame, UIEdgeInsetsMake(0, 0, self.bottomInfoView.bounds.size.height, 0));  //要扣掉底部view
+    }
+    
+    //最后要实现的效果就是，判断这次的点击，是否在地图范围内，没有被其他视图遮挡
+    if (CGRectContainsPoint(frame, point)) {
+        self.showMode = AMapNaviRideViewShowModeNormal;
+    }
+    
+}
+
+- (void)setShowMode:(AMapNaviDriveViewShowMode)showMode {
+    
+    if (_showMode == showMode) {
+        return;
+    }
+    
+    _showMode = showMode;
+    
+    if (showMode == AMapNaviRideViewShowModeNormal) {
+        [self handleShowModeToNormal];
+    } else if (showMode == AMapNaviRideViewShowModeCarPositionLocked) {
+        [self handleShowModeToLockedCarPosition];
+    }
+}
+
+- (void)handleShowModeToNormal {
+    self.lockCarPosition = NO;
+    self.bottomRemainBgView.hidden = YES;
+    self.bottomContinueNaviBgView.hidden = NO;
+}
+
+- (void)handleShowModeToLockedCarPosition {
+    self.lockCarPosition = YES;
+    [self updateBottomInfoView];
+    self.bottomContinueNaviBgView.hidden = YES;
+    
+    //恢复锁车模式，设置地图为正确状态
+    if (self.carAnnotation) {
+        [self changeToNaviModeAtPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
+    }
+}
+
 
 #pragma -mark car timer
 
@@ -236,14 +307,22 @@
         double desLon = self.priorPoint.longitude + self.lonOffset * self.splitCount;
         double desDirection = self.priorCarDirection + self.directionOffset * self.splitCount;
         
+        double mapViewRotationDegree = 0;
+        if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) { //地图方向不变，一直朝北，车头方向改变
+            mapViewRotationDegree = 0;
+        } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth ) {  //车头方向不变，一直朝北，地图方向改变
+            mapViewRotationDegree = desDirection;
+        }
+        
         if (self.lockCarPosition) {
-            [self.internalMapView setRotationDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];  //一次性执行，animated:可设置为YES。
+            [self.internalMapView setRotationDegree:mapViewRotationDegree animated:YES duration:kAMapNaviInternalAnimationDuration];  //一次性执行，animated:可设置为YES。
             [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(desLat, desLon) animated:YES];
         }
         
         [self.carAnnotation setCoordinate:CLLocationCoordinate2DMake(desLat, desLon)];
         [self.carAnnotationView setCarDirection:desDirection];
         [self.carAnnotationView setCompassDirection:0];
+        
         
         self.stepCount = 0;
         self.needMoving = NO;
@@ -258,14 +337,21 @@
         double stepLon = self.priorPoint.longitude + self.lonOffset * self.stepCount;
         double stepDirection = self.priorCarDirection + self.directionOffset * self.stepCount;
         
-        if (self.lockCarPosition) {
-            [self.internalMapView setRotationDegree:0 animated:NO duration:kAMapNaviInternalAnimationDuration]; //旋转角度animated:必须为NO，否则卡顿
-            [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(stepLat, stepLon) animated:NO]; //这边地图中心点的移动animated:必须为NO，否则会有卡顿的感觉
+        double mapViewRotationDegree = 0;
+        if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) { //地图方向不变，一直朝北，车头方向改变
+            mapViewRotationDegree = 0;
+        } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth ) {  //车头相对屏幕的方向不变，一直朝北，地图方向改变
+            mapViewRotationDegree = stepDirection;
         }
         
+        if (self.lockCarPosition) {
+            [self.internalMapView setRotationDegree:mapViewRotationDegree animated:NO duration:kAMapNaviInternalAnimationDuration]; //旋转角度animated:必须为NO，否则卡顿
+            [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(stepLat, stepLon) animated:NO]; //这边地图中心点的移动animated:必须为NO，否则会有卡顿的感觉
+        }
+    
         [self.carAnnotation setCoordinate:CLLocationCoordinate2DMake(stepLat, stepLon)];
-        [self.carAnnotationView setCarDirection:stepDirection];
-        [self.carAnnotationView setCompassDirection:0];
+        [self.carAnnotationView setCarDirection:stepDirection];  //无论哪种跟随模式，车在地图上的方向都要改变，来适应一直车头对着道路前进的方向
+        [self.carAnnotationView setCompassDirection:0];  //无论哪种跟随模式，车的罗盘的方向的北一直和地图上指南针的北指向同一个方向，因为setCarDirection已经做了改变，让carAnnotationView整体改变，所以这边一直保持为0
         
     } else {
         self.stepCount = 0;
@@ -286,6 +372,7 @@
 
 //上一次导航信息更新后的一些信息记录为prior，通过这一次导航信息和上一次信息的差值除于14，表示每一次设置的单位量，timer中就会每一次增加一个单位量，来平滑的做动画.
 - (void)moveCarToCoordinate:(AMapNaviPoint *)coordinate direction:(double)direction zoomLevel:(double)zoomLevle {
+    
     if (coordinate == nil || coordinate.latitude == 0 || coordinate.longitude == 0) {
         return;
     }
@@ -294,8 +381,9 @@
     self.priorCarDirection = self.carAnnotationView.carDirection;
     self.priorZoomLevel = self.internalMapView.zoomLevel;
     
+    //每一次导航信息更新的位置等信息被拆分为14份，让1秒内的14次timer调用，每次执行加1份，动画才能顺
     self.stepCount = 0;
-    self.latOffset = (coordinate.latitude - self.priorPoint.latitude) / self.splitCount;
+    self.latOffset = (coordinate.latitude - self.priorPoint.latitude) / self.splitCount;  //1个单位的delta
     self.lonOffset = (coordinate.longitude - self.priorPoint.longitude) / self.splitCount;
     self.directionOffset = [self normalizeOffsetDegree:(direction - self.priorCarDirection)] / self.splitCount;
     self.zoomLevelOffset = (zoomLevle - self.priorZoomLevel) / self.splitCount;
@@ -323,7 +411,7 @@
     //画出规划的路径，一般在这里画的路径都是不带路况信息，因为路况信息的回调还没调用。
     [self updateRoutePolyline];
     
-    //起点，终点，沿途
+    //起点，终点，沿途的点的绘制
     [self updateRoutePointAnnotation];
     
     //更新电子眼信息
@@ -377,7 +465,6 @@
         //这边需要算一下用户目前的位置和实际开始导航的起点的位置的距离，如果在300米以内，就将moveDirectly设置为NO，表示，timer中不需要移动地图上车的位置（300米这个误差，在地图上显示的感知比较小），如果大于300米，timer中会移动车的位置到指定地点，移动到后也会设置为NO，再也不会设置YES了，这个分支只会走一次。
         if (self.moveDirectly) {
             double distance = [AMapNaviViewUtilityX calcDistanceBetweenPoint:self.currentNaviInfo.carCoordinate andPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
-            NSLog(@"distance : %f",distance);
             if (distance <= kAMapNaviMoveDirectlyMaxDistance && distance > kAMapNaviMoveDirectlyMinDistance) {
                 self.moveDirectly = NO;
             }
@@ -391,7 +478,7 @@
 
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviLocation:(AMapNaviLocation *)naviLocation {
-    NSLog(@"自车位置更新");
+//    NSLog(@"自车位置更新");
     
     self.currentCarLocation = naviLocation;
     
@@ -402,7 +489,7 @@
 
 //路况信息更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateTrafficStatus:(NSArray<AMapNaviTrafficStatus *> *)trafficStatus {
-    NSLog(@"路况信息更新");
+//    NSLog(@"路况信息更新");
     
     self.trafficStatus = trafficStatus;
     
@@ -413,7 +500,6 @@
 
 //需要显示路口放大图了
 - (void)driveManager:(AMapNaviDriveManager *)driveManager showCrossImage:(UIImage *)crossImage {
-    NSLog(@"需要显示路口放大图了");
     
     if (crossImage) {
         self.crossImageView.image = crossImage;
@@ -424,7 +510,6 @@
 
 //需要把路口放大图了隐藏了
 - (void)driveManagerHideCrossImage:(AMapNaviDriveManager *)driveManager {
-    NSLog(@"需要把路口放大图了隐藏了");
     
     self.crossImageView.image = nil;
     self.crossImageView.hidden = YES;
@@ -433,7 +518,6 @@
 
 //需要显示车道信息了
 - (void)driveManager:(AMapNaviDriveManager *)driveManager showLaneBackInfo:(NSString *)laneBackInfo laneSelectInfo:(NSString *)laneSelectInfo {
-    NSLog(@"需要显示车道信息");
     
     UIImage *image = CreateLaneInfoImageWithLaneInfo(laneBackInfo, laneSelectInfo);
     if (image) {
@@ -444,7 +528,6 @@
 
 //需要隐藏车道信息
 - (void)driveManagerHideLaneInfo:(AMapNaviDriveManager *)driveManager {
-    NSLog(@"需要隐藏车道信息");
     
     self.laneInfoView.image = nil;
     self.laneInfoView.hidden = YES;
@@ -489,10 +572,12 @@
 #pragma -mark MapView
 
 - (void)configureMapView {
+    
     self.internalMapView.showsScale = NO;
     self.internalMapView.showsIndoorMap = NO;
     self.internalMapView.showsBuildings = NO;
     self.internalMapView.maxRenderFrame = 30;
+    self.internalMapView.isAllowDecreaseFrame = NO;  //不允许降帧，否则地图一段时间不动的情况下，会被降帧，车的移动就会出现卡顿
     self.internalMapView.delegate = self;
     self.internalMapView.zoomLevel = 11.1;
     self.internalMapView.centerCoordinate = CLLocationCoordinate2DMake(39.906207, 116.397582);
@@ -548,10 +633,11 @@
 - (void)configureBottomInfoView {
     self.bottomInfoView.backgroundColor = kAMapNaviInfoViewBackgroundColor;
     self.bottomRemainBgView.hidden = YES;
+    self.bottomContinueNaviBgView.hidden = YES;
 }
 
 - (void)updateBottomInfoView {
-    if (self.currentNaviInfo) {
+    if (self.currentNaviInfo && self.showMode == AMapNaviRideViewShowModeCarPositionLocked) {  //如果不是锁车状态，bottomRemainBgView不应该显示
         
         self.bottomRemainTimeLabel.text = [AMapNaviViewUtilityX normalizedRemainTime:self.currentNaviInfo.routeRemainTime];
         self.bottomRemainDistanceLabel.text = [AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.routeRemainDistance];
@@ -597,6 +683,21 @@
 }
 
 #pragma -mark xib btns click
+
+- (IBAction)moreBtnClick:(id)sender {
+
+    //更改跟随模式
+    if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) {
+        self.trackingMode = AMapNaviViewTrackingModeCarNorth;
+    } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth) {
+        self.trackingMode = AMapNaviViewTrackingModeMapNorth;
+    }
+}
+
+- (IBAction)continueNaviBtnClick:(id)sender {
+    self.showMode = AMapNaviRideViewShowModeCarPositionLocked;
+}
+
 
 - (IBAction)goBack:(id)sender {
     
@@ -986,6 +1087,11 @@
 
 
 #pragma mark - MAMapViewDelegate
+
+//地图区域改变完成后会调用此接口
+- (void)mapView:(MAMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+//    NSLog(@"===============");
+}
 
 //覆盖物的属性设置
 - (MAOverlayRenderer *)mapView:(MAMapView *)mapView rendererForOverlay:(id<MAOverlay>)overlay {

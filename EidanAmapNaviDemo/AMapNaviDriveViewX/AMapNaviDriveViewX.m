@@ -38,23 +38,6 @@
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
 
-//interface
-
-///规划路径overlay的宽度
-@property (nonatomic, assign) CGFloat lineWidth;
-
-///是否显示实时交通图层,默认YES
-@property (nonatomic, assign) BOOL showTrafficLayer;
-
-///锁车状态下地图cameraDegree, 默认30.0, 范围[0,60]
-@property (nonatomic, assign) CGFloat cameraDegree;
-
-///导航界面显示模式,默认AMapNaviDriveViewShowModeCarPositionLocked
-@property (nonatomic, assign) AMapNaviDriveViewShowMode showMode;  //不管什么模式，车一直都是在运动的，区分的只有地图的状态
-
-//跟随模式：地图朝北，车头朝北
-@property (nonatomic, assign) AMapNaviViewTrackingMode trackingMode;  //其实更改跟随模式，只在lockCarPosition为YES，即锁车显示模式才有效果，此时地图的状态是跟着变的，而如果showMode为其他显示模式，地图不跟着动，就无所谓怎么跟随了
-
 //private
 @property (nonatomic, assign) BOOL lockCarPosition;  //车相对屏幕的位置是否不改变，YES代表不改变，车永远在屏幕中间，那么就需要移动地图中心点，NO代表改变，不需要改变地图中心点.
 
@@ -120,7 +103,7 @@
 
 //rightTipsView
 @property (nonatomic, weak) IBOutlet UIButton *rightBrowserBtn;
-
+@property (nonatomic, weak) IBOutlet UIButton *rightSwitchTrafficBtn;
 
 //Constraint
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeight;
@@ -208,14 +191,16 @@
 - (void)initProperties {
     
     //public
-    self.lineWidth = kAMapNaviRoutePolylineDefaultWidth;
-    self.showTrafficLayer = YES;
     self.trackingMode = AMapNaviViewTrackingModeMapNorth;
+    //以下几个变量都有重写setter，这边应该写成 _lineWidth = kAMapNaviRoutePolylineDefaultWidth 这种不会调用setter的写法，但是这几个变量，不写也没关系，因为即使走了setter也都会被return回来
+    self.lineWidth = kAMapNaviRoutePolylineDefaultWidth;
+    self.cameraDegree = kAMapNaviLockStateCameraDegree;
+    self.showTrafficLayer = YES;
     self.showMode = AMapNaviRideViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
+    
     
     //car and map move
     self.splitCount = kAMapNaviMoveCarSplitCount;
-    self.cameraDegree = kAMapNaviLockStateCameraDegree;
     self.needMoving = NO;
     self.moveDirectly = YES;
     
@@ -226,6 +211,29 @@
 
 - (void)layoutSubviews {
     self.customView.frame = self.bounds;
+}
+
+#pragma -mark Interface
+
+- (void)setShowTrafficLayer:(BOOL)showTrafficLayer {
+    _showTrafficLayer = showTrafficLayer;
+    self.internalMapView.showTraffic = showTrafficLayer;
+    [self updateRoutePolyline];  //重绘路径
+}
+
+- (void)setLineWidth:(CGFloat)lineWidth {
+    _lineWidth = lineWidth;
+    [self updateRoutePolyline];  //重绘路径
+}
+
+- (void)setCameraDegree:(CGFloat)cameraDegree {
+    
+    _cameraDegree = MAX(0, MIN(60.0, cameraDegree));
+    
+    if (self.lockCarPosition) {  //锁车模式下，摄像机的角度才是固定，生效的，非锁车模式下，用户自己会旋转成任意值。所以如果当前在锁车，直接改，不在锁车不用改，等切到锁车的时候，那边会改
+        [self.internalMapView setCameraDegree:_cameraDegree animated:YES duration:kAMapNaviInternalAnimationDuration];
+    }
+    
 }
 
 #pragma -mark 显示模式切换
@@ -273,14 +281,15 @@
     self.lockCarPosition = NO;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = NO;
-    self.rightBrowserBtn.hidden = NO;
-    self.rightBrowserBtn.selected = NO; //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
+    self.rightSwitchTrafficBtn.hidden = NO;
+    self.rightBrowserBtn.hidden = self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
 }
 
 - (void)handleShowModeToLockedCarPosition {
     self.lockCarPosition = YES;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = YES;
+    self.rightSwitchTrafficBtn.hidden = YES;
     self.rightBrowserBtn.hidden = YES;
     
     //恢复锁车模式，设置地图为正确状态
@@ -612,6 +621,7 @@
     self.internalMapView.showsScale = NO;
     self.internalMapView.showsIndoorMap = NO;
     self.internalMapView.showsBuildings = NO;
+    self.internalMapView.showsCompass = NO;
     self.internalMapView.maxRenderFrame = 30;
     self.internalMapView.isAllowDecreaseFrame = NO;  //不允许降帧，否则地图一段时间不动的情况下，会被降帧，车的移动就会出现卡顿
     self.internalMapView.delegate = self;
@@ -722,6 +732,7 @@
 
 - (void)configureRightTipsView {
     self.rightBrowserBtn.hidden = YES;
+    self.rightSwitchTrafficBtn.hidden = YES;
 }
 
 #pragma -mark xib btns click
@@ -741,6 +752,20 @@
 - (IBAction)continueNaviBtnClick:(id)sender {
     self.showMode = AMapNaviRideViewShowModeCarPositionLocked;  //切换成锁车模式
 }
+
+//切换路况按钮点击
+- (IBAction)swichTrafficBtnClick:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    
+    if (btn.selected == NO) {  //点击从有路况切成没路况
+        self.showTrafficLayer = NO;
+    } else { //点击从无路况切成有路况
+        self.showTrafficLayer = YES;
+    }
+    
+    btn.selected = !btn.selected;
+}
+
 
 //全览按钮点击
 - (IBAction)browserBtnClick:(id)sender {

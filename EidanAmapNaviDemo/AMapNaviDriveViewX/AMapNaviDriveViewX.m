@@ -112,12 +112,14 @@
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
 @property (nonatomic, weak) IBOutlet UIView *bottomContinueNaviBgView;
 
-
 //leftTipsView
 @property (nonatomic, weak) IBOutlet UIView *leftCameraInfoView;
 @property (nonatomic, weak) IBOutlet UIImageView *leftCameraInfoImageView;
 @property (nonatomic, weak) IBOutlet UIView *leftSpeedInfoView;
 @property (nonatomic, weak) IBOutlet UILabel *leftSpeedInfoLabel;
+
+//rightTipsView
+@property (nonatomic, weak) IBOutlet UIButton *rightBrowserBtn;
 
 
 //Constraint
@@ -175,6 +177,9 @@
     //leftInfoView
     [self configureLeftCameraAndSpeedView];
     
+    //rightInfoView
+    [self configureRightTipsView];
+    
     //mapView
     [self configureMapView];
     
@@ -223,7 +228,7 @@
     self.customView.frame = self.bounds;
 }
 
-#pragma -mark 显示模式改变
+#pragma -mark 显示模式切换
 
 //点击地图范围内，切换成普通模式
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -259,19 +264,24 @@
         [self handleShowModeToNormal];
     } else if (showMode == AMapNaviRideViewShowModeCarPositionLocked) {
         [self handleShowModeToLockedCarPosition];
+    } else if (showMode == AMapNaviRideViewShowModeOverview) {
+        [self handleShowModeToOverview];
     }
 }
 
 - (void)handleShowModeToNormal {
     self.lockCarPosition = NO;
-    self.bottomRemainBgView.hidden = YES;
+    [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = NO;
+    self.rightBrowserBtn.hidden = NO;
+    self.rightBrowserBtn.selected = NO; //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
 }
 
 - (void)handleShowModeToLockedCarPosition {
     self.lockCarPosition = YES;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = YES;
+    self.rightBrowserBtn.hidden = YES;
     
     //恢复锁车模式，设置地图为正确状态
     if (self.carAnnotation) {
@@ -279,6 +289,42 @@
     }
 }
 
+- (void)handleShowModeToOverview {
+    self.lockCarPosition = NO;
+    [self updateBottomInfoView];
+    self.bottomContinueNaviBgView.hidden = YES;
+    [self showMapRegionWithBounds:self.currentNaviRoute.routeBounds centerCoordinate:self.currentNaviRoute.routeCenterPoint];  //能走到这一步self.currentNaviRoute肯定有值，不然普通模式都不行，更不用说全览模式
+}
+
+//锁车模式下，设置地图为正确的状态
+- (void)changeToNaviModeAtPoint:(AMapNaviPoint *)point {
+    
+    if (point == nil) return;
+    
+    [self.internalMapView setCameraDegree:self.cameraDegree animated:YES duration:kAMapNaviInternalAnimationDuration];
+    [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(point.latitude, point.longitude) animated:YES];
+    [self.internalMapView setZoomLevel:kAMapNaviLockStateZoomLevel animated:NO]; //设置为NO，为YES的话，第一个转弯路口没有箭头overlay，因为zoomLevel不对，被return回来了
+}
+
+//全览模式下，设置地图为正确的状态
+- (void)showMapRegionWithBounds:(AMapNaviPointBounds *)bounds centerCoordinate:(AMapNaviPoint *)center {
+    
+    if (bounds == nil || center == nil) return;
+    
+    CLLocationCoordinate2D centerCoordinate = CLLocationCoordinate2DMake(center.latitude, center.longitude);
+    
+    CLLocationDegrees latitudeDelta = bounds.northEast.latitude - bounds.southWest.latitude;
+    CLLocationDegrees longitudeDelta = bounds.northEast.longitude - bounds.southWest.longitude;
+    
+    MACoordinateRegion region = MACoordinateRegionMake(centerCoordinate, MACoordinateSpanMake(latitudeDelta, longitudeDelta));
+    MAMapRect mapRect = MAMapRectForCoordinateRegion(region);
+    
+    UIEdgeInsets insets = UIEdgeInsetsMake(20, 20, 20, 20);
+    
+    [self.internalMapView setRotationDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
+    [self.internalMapView setCameraDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
+    [self.internalMapView setVisibleMapRect:mapRect edgePadding:insets animated:YES];
+}
 
 #pragma -mark car timer
 
@@ -360,16 +406,6 @@
     
 }
 
-//路径信息更新后的设置
-- (void)changeToNaviModeAtPoint:(AMapNaviPoint *)point {
-    
-    if (point == nil) return;
-    
-    [self.internalMapView setCameraDegree:self.cameraDegree animated:YES duration:kAMapNaviInternalAnimationDuration];
-    [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(point.latitude, point.longitude) animated:YES];
-    [self.internalMapView setZoomLevel:kAMapNaviLockStateZoomLevel animated:NO]; //为NO，为YES的话，第一个转弯路口没有箭头overlay，因为zoomLevel不对，被return回来了
-}
-
 //上一次导航信息更新后的一些信息记录为prior，通过这一次导航信息和上一次信息的差值除于14，表示每一次设置的单位量，timer中就会每一次增加一个单位量，来平滑的做动画.
 - (void)moveCarToCoordinate:(AMapNaviPoint *)coordinate direction:(double)direction zoomLevel:(double)zoomLevle {
     
@@ -417,7 +453,7 @@
     //更新电子眼信息
     [self updateRouteCameraAnnotationWithStartIndex:0];
     
-    //地图的中心点，缩放级别，摄像机角度
+    //锁车模式下，地图的中心点，缩放级别，摄像机角度
     [self changeToNaviModeAtPoint:self.currentNaviRoute.routeStartPoint];
     
     //更新转向箭头，这里的显示与否有取决于zoomLevel,所以必须在changeToNaviModeAtPoint先把zoomLebel设定对了，再执行这个函数，第一个路口才会有箭头，而且changeToNaviModeAtPoint里面setZoomLevel不能有动画
@@ -637,7 +673,7 @@
 }
 
 - (void)updateBottomInfoView {
-    if (self.currentNaviInfo && self.showMode == AMapNaviRideViewShowModeCarPositionLocked) {  //如果不是锁车状态，bottomRemainBgView不应该显示
+    if (self.currentNaviInfo && (self.showMode == AMapNaviRideViewShowModeCarPositionLocked || self.showMode == AMapNaviRideViewShowModeOverview)) {  //如果不是锁车状态或者全览模式，bottomRemainBgView不应该显示
         
         self.bottomRemainTimeLabel.text = [AMapNaviViewUtilityX normalizedRemainTime:self.currentNaviInfo.routeRemainTime];
         self.bottomRemainDistanceLabel.text = [AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.routeRemainDistance];
@@ -682,8 +718,15 @@
     }
 }
 
+#pragma -mark rightTipsView
+
+- (void)configureRightTipsView {
+    self.rightBrowserBtn.hidden = YES;
+}
+
 #pragma -mark xib btns click
 
+//更多按钮点击
 - (IBAction)moreBtnClick:(id)sender {
 
     //更改跟随模式
@@ -694,8 +737,22 @@
     }
 }
 
+//继续导航按钮点击
 - (IBAction)continueNaviBtnClick:(id)sender {
-    self.showMode = AMapNaviRideViewShowModeCarPositionLocked;
+    self.showMode = AMapNaviRideViewShowModeCarPositionLocked;  //切换成锁车模式
+}
+
+//全览按钮点击
+- (IBAction)browserBtnClick:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    
+    if (btn.selected == NO) {  //点击从普通模式切换成全览模式
+        self.showMode = AMapNaviRideViewShowModeOverview;
+    } else { //点击从全览模式切换成锁车模式
+        self.showMode = AMapNaviRideViewShowModeCarPositionLocked;
+    }
+    
+    btn.selected = !btn.selected;
 }
 
 

@@ -12,7 +12,7 @@
 
 #import "SpeechSynthesizer.h"
 
-@interface NaviTestViewController ()<AMapNaviDriveManagerDelegate>
+@interface NaviTestViewController ()<AMapNaviDriveManagerDelegate,AMapNaviDriveViewXDelegate>
 
 @property (nonatomic, strong) AMapNaviDriveManager *driveManager;
 
@@ -30,16 +30,23 @@
     
     //为了方便展示,选择了固定的起终点
     self.startPoint = [AMapNaviPoint locationWithLatitude:39.993135 longitude:116.474175];
-    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
+//    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
+    self.endPoint = [AMapNaviPoint locationWithLatitude:40.004494 longitude:116.475924];  //望京西园1区
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
     
+    self.driveView.delegate = self;
+    
     //将driveView添加为导航数据的Representative，使其可以接收到导航诱导数据
     [self.driveManager addDataRepresentative:self.driveView];
     
-    [self calculateRoute];
+    
     // Do any additional setup after loading the view from its nib.
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+     [self calculateRoute];
 }
 
 //进行路径规划
@@ -53,6 +60,24 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc {
+    NSLog(@"------------------ VC dealloc");
+}
+
+#pragma mark - AMapNaviDriveViewXDelegate
+
+- (void)driveViewXCloseButtonClicked:(AMapNaviDriveViewX *)driveView {
+    
+    //停止导航
+    [self.driveManager stopNavi];
+    [self.driveManager removeDataRepresentative:self.driveView];
+    
+    //停止语音 
+    [[SpeechSynthesizer sharedSpeechSynthesizer] stopSpeak];
+    
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 
@@ -113,10 +138,6 @@
     NSLog(@"onArrivedDestination");
 }
 
-
-- (IBAction)goBack:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
-}
 
 
 @end

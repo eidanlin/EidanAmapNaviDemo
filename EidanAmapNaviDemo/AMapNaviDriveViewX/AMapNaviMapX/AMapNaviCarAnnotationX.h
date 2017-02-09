@@ -15,3 +15,14 @@
 - (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate;
 
 @end
+
+
+#pragma -mark AMapNaviTimerTargetX
+
+@interface AMapNaviTimerTargetX : NSObject
+
+@property (nonatomic, weak) id realTarget;
+
+- (void)moveCarLocationSmooth:(NSTimer *)timer;
+
+@end

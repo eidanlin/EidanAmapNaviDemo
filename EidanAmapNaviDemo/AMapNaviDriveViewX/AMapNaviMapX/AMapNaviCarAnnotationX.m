@@ -18,3 +18,16 @@
 }
 
 @end
+
+
+#pragma -mark AMapNaviTimerTarget
+
+@implementation AMapNaviTimerTargetX
+
+- (void)moveCarLocationSmooth:(NSTimer *)timer {
+    if (self.realTarget && [self.realTarget respondsToSelector:@selector(moveCarLocationSmooth:)]) {
+        [self.realTarget performSelector:@selector(moveCarLocationSmooth:) withObject:timer];
+    }
+}
+
+@end

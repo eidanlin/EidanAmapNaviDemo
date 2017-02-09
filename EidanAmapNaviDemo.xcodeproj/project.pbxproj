@@ -381,6 +381,7 @@
 		D98F9F431E28D6490040F730 /* AMapNaviCarAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9F421E28D6490040F730 /* AMapNaviCarAnnotationViewX.m */; };
 		D98F9F461E28D8BC0040F730 /* AMapNaviCarAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9F451E28D8BC0040F730 /* AMapNaviCarAnnotationX.m */; };
 		D98F9F4A1E28EAB70040F730 /* AMapNaviViewUtilityX.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9F491E28EAB70040F730 /* AMapNaviViewUtilityX.m */; };
+		D9CE843A1E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9CE84391E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -773,6 +774,8 @@
 		D98F9F451E28D8BC0040F730 /* AMapNaviCarAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviCarAnnotationX.m; sourceTree = "<group>"; };
 		D98F9F481E28EAB70040F730 /* AMapNaviViewUtilityX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviViewUtilityX.h; sourceTree = "<group>"; };
 		D98F9F491E28EAB70040F730 /* AMapNaviViewUtilityX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviViewUtilityX.m; sourceTree = "<group>"; };
+		D9CE84381E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviTrafficBarViewX.h; sourceTree = "<group>"; };
+		D9CE84391E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviTrafficBarViewX.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -858,6 +861,8 @@
 				D98F9C6A1E28C6520040F730 /* AMapNaviDriveViewX.h */,
 				D98F9C6B1E28C6520040F730 /* AMapNaviDriveViewX.m */,
 				D98F9C6D1E28C68C0040F730 /* AMapNaviDriveViewX.xib */,
+				D9CE84381E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.h */,
+				D9CE84391E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m */,
 				D98F9F471E28EAAD0040F730 /* AMapNaviViewX */,
 				D98F9F401E28D6130040F730 /* AMapNaviMapX */,
 			);
@@ -1778,6 +1783,7 @@
 				D98F9F431E28D6490040F730 /* AMapNaviCarAnnotationViewX.m in Sources */,
 				D98F9F461E28D8BC0040F730 /* AMapNaviCarAnnotationX.m in Sources */,
 				D98F9C671E28C4330040F730 /* NaviTestViewController.m in Sources */,
+				D9CE843A1E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m in Sources */,
 				D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */,
 				D98F9C551E28C1560040F730 /* ViewController.m in Sources */,
 				D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */,

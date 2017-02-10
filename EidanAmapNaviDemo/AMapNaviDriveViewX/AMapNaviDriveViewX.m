@@ -218,7 +218,6 @@
 #pragma -mark dealloc
 
 - (void)dealloc {
-    NSLog(@"=================== dealloc");
     [self stopMoveCarTimer];
     self.internalMapView.delegate = nil;
 }
@@ -525,24 +524,21 @@
         [self.carAnnotationView.superview bringSubviewToFront:self.carAnnotationView];
     }
     
-    //更新地图显示
+//    //更新地图显示
 //    if (self.currentNaviMode == AMapNaviModeEmulator) {
-    
-//        //因为初始化的时候self.moveDirectly设置为YES，timer中会直接一步到位的把车的位置和方向设置对了，比如导航开始的点在天安门，而你在望京，一步到位，如果走1秒14次的地图和车的变化，会显得很拖拉，用户会不知所云
+//        //因为初始化的时候self.moveDirectly设置为YES，timer中会直接一步到位的把车的位置和方向设置对了，比如导航开始的点在天安门，而你在望京，一步到位，如果走1秒14次的地图和车的变化，会很拖拉，用户会不知所云
 //        //这边需要算一下车图标目前的位置和实际开始导航的起点的位置的距离，如果在300米以内，就将moveDirectly设置为NO，表示，timer中不需要一步到位，1秒14次的动画平移效果挺好的。
-    
 //        if (self.moveDirectly) {
 //            double distance = [AMapNaviViewUtilityX calcDistanceBetweenPoint:self.currentNaviInfo.carCoordinate andPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
 //            if (distance <= kAMapNaviMoveDirectlyMaxDistance && distance > kAMapNaviMoveDirectlyMinDistance) {
 //                self.moveDirectly = NO;
 //            }
 //        }
-        
-        //每一次导航信息更新后，都算一下，车应该以什么样的角度显示在地图的哪个地方，needMoving 设置为YES。
-        //不管是模拟导航，GPS导航，还是None（比如巡航），导航信息更新，都会返回目前系统检测到的最新的自车位置，那么地图上的车图标就要跟着更新到这个位置
-        [self moveCarAnnotationToCoordinate:self.currentNaviInfo.carCoordinate direction:self.currentNaviInfo.carDirection zoomLevel:kAMapNaviLockStateZoomLevel];
-        
 //    }
+    
+    //每一次导航信息更新后，都算一下，车应该以什么样的角度显示在地图的哪个地方，needMoving 设置为YES。
+    //不管是模拟导航，GPS导航，还是None（比如巡航），导航信息更新，都会返回目前系统检测到的最新的自车位置，那么地图上的车图标就要跟着更新到这个位置
+    [self moveCarAnnotationToCoordinate:self.currentNaviInfo.carCoordinate direction:self.currentNaviInfo.carDirection zoomLevel:kAMapNaviLockStateZoomLevel];
 }
 
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
@@ -556,7 +552,7 @@
         return;
     }
     
-//    //正在GPS导航或者没有导航，比如巡航，只要车的位置改变，需要对车的图标进行移动。
+//    //正在GPS导航或者没有导航，比如巡航，只要车的位置改变，需要对车的图标进行移动，目前不处理，因为导航信息更新回调统一处理了
 //    if (self.currentNaviMode == AMapNaviModeGPS || self.currentNaviMode == AMapNaviModeNone) {
 //        
 //    }

@@ -245,6 +245,11 @@
     
 }
 
+- (void)setTrackingMode:(AMapNaviViewTrackingMode)trackingMode {
+    _trackingMode = trackingMode;
+    [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:YES];  //如果是GPS导航，不移动位置，或者说导航信息没有更新，timer没有在走，这个时候你改变跟随模式，是没有效果的，所以为了一更改跟随模式就有效果，需要重设一下车和地图的状态
+}
+
 #pragma -mark 显示模式切换
 
 //点击地图范围内，切换成普通模式
@@ -303,10 +308,11 @@
     self.rightBrowserBtn.hidden = YES;
     self.rightTrafficBarView.hidden = NO;
     
-    //恢复锁车模式，设置地图为正确状态
+    //恢复锁车模式，设置地图和车为正确状态，特别是车的倾斜角度,先把地图的倾斜角度设置对了，根据地图的倾斜角度设置车，顺序不能乱，设置车的倾斜角度中，也要设置地图的旋转角度
     if (self.carAnnotation) {
         [self changeToNaviModeAtPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
     }
+    [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:YES];
 }
 
 - (void)handleShowModeToOverview {
@@ -321,7 +327,7 @@
     
     if (point == nil) return;
     
-    [self.internalMapView setCameraDegree:self.cameraDegree animated:YES duration:kAMapNaviInternalAnimationDuration];
+    [self.internalMapView setCameraDegree:self.cameraDegree animated:NO duration:kAMapNaviInternalAnimationDuration];  //不能有动画，否则恢复锁车模式的时候，车的倾斜角度要根据地图的来，地图如果动画切过去，车没办法正确设置，详见handleShowModeToLockedCarPosition中的resetCarAnnotaionToRightStateAndIsNeedResetMapView。
     [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(point.latitude, point.longitude) animated:YES];
     [self.internalMapView setZoomLevel:kAMapNaviLockStateZoomLevel animated:NO]; //设置为NO，为YES的话，第一个转弯路口没有箭头overlay，因为zoomLevel不对，被return回来了
 }
@@ -344,6 +350,30 @@
     [self.internalMapView setRotationDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
     [self.internalMapView setCameraDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
     [self.internalMapView setVisibleMapRect:mapRect edgePadding:insets animated:YES];
+}
+
+//设置车的倾斜角度和旋转角度还有位置。也可以设置地图的中心点和旋转角度，但不设置地图的倾斜角度（即摄像机角度）
+- (void)resetCarAnnotaionToRightStateAndIsNeedResetMapView:(BOOL)isNeed {
+    
+    [self.carAnnotation setCoordinate:self.carAnnotation.coordinate];
+    [self.carAnnotationView setCarDirection:self.carAnnotationView.carDirection];
+    [self.carAnnotationView setCompassDirection:0];
+    
+    //这边设置地图，特别是设置地图的旋转角度，如果是地图朝北，地图就是旋转0度（因为默认朝北），如果是车头朝北，地图就要设置成车的旋转角度，保证车头朝北，因为车头能朝北，就是地图旋转后形成的。
+    if (self.lockCarPosition && isNeed) {  //需要 且在 锁车模式，才设置，如果不是锁车模式，地图不跟着动，设置地图就没有意义了，所以需要锁车模式
+        
+        double degree = 0;
+        
+        if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) {
+            degree = 0;
+        } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth) {
+            degree = self.carAnnotationView.carDirection;
+        }
+        
+        [self.internalMapView setRotationDegree:degree animated:NO duration:0];
+        [self.internalMapView setCenterCoordinate:self.carAnnotation.coordinate animated:NO];
+    }
+    
 }
 
 #pragma -mark car timer
@@ -1208,7 +1238,12 @@
 
 //地图区域改变完成后会调用此接口
 - (void)mapView:(MAMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-//    NSLog(@"===============");
+    
+    //用户利用手势改变地图的摄像机角度，缩放地图，地图的旋转角度，一定会进入非锁车模式，这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。地图的状态在非锁车模式下处理了，也没用，所以不处理
+    if (self.lockCarPosition == NO) {
+        [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO];
+    }
+    
 }
 
 //覆盖物的属性设置

@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "NaviTestViewController.h"
+#import "GPSEmulatorViewController.h"
 
 @interface ViewController ()
 
@@ -26,9 +27,16 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)doSomething:(id)sender {
+- (IBAction)doEmulatorNavi:(id)sender {
     
     NaviTestViewController *vc = [[NaviTestViewController alloc] initWithNibName:@"NaviTestViewController" bundle:nil];
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+- (IBAction)doGPSEmulatorNavi:(id)sender {
+    
+    GPSEmulatorViewController *vc = [[GPSEmulatorViewController alloc] initWithNibName:@"GPSEmulatorViewController" bundle:nil];
     [self.navigationController pushViewController:vc animated:YES];
     
 }

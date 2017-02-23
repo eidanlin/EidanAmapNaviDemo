@@ -218,6 +218,7 @@
 #pragma -mark dealloc
 
 - (void)dealloc {
+    NSLog(@"----------- driveViewX dealloc");
     [self stopMoveCarTimer];
     self.internalMapView.delegate = nil;
 }

@@ -382,6 +382,11 @@
 		D98F9F461E28D8BC0040F730 /* AMapNaviCarAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9F451E28D8BC0040F730 /* AMapNaviCarAnnotationX.m */; };
 		D98F9F4A1E28EAB70040F730 /* AMapNaviViewUtilityX.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9F491E28EAB70040F730 /* AMapNaviViewUtilityX.m */; };
 		D9CE843A1E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9CE84391E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m */; };
+		D9DD04DC1E5EE969009C542F /* GPSEmulatorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D9DD04DA1E5EE969009C542F /* GPSEmulatorViewController.m */; };
+		D9DD04DD1E5EE969009C542F /* GPSEmulatorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04DB1E5EE969009C542F /* GPSEmulatorViewController.xib */; };
+		D9DD04E21E5EE9A6009C542F /* AMapNaviEmulatorLocations in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04DE1E5EE9A6009C542F /* AMapNaviEmulatorLocations */; };
+		D9DD04E31E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04DF1E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes */; };
+		D9DD04E41E5EE9A6009C542F /* GPSEmulator.m in Sources */ = {isa = PBXBuildFile; fileRef = D9DD04E11E5EE9A6009C542F /* GPSEmulator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -776,6 +781,13 @@
 		D98F9F491E28EAB70040F730 /* AMapNaviViewUtilityX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviViewUtilityX.m; sourceTree = "<group>"; };
 		D9CE84381E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviTrafficBarViewX.h; sourceTree = "<group>"; };
 		D9CE84391E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviTrafficBarViewX.m; sourceTree = "<group>"; };
+		D9DD04D91E5EE969009C542F /* GPSEmulatorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPSEmulatorViewController.h; sourceTree = "<group>"; };
+		D9DD04DA1E5EE969009C542F /* GPSEmulatorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPSEmulatorViewController.m; sourceTree = "<group>"; };
+		D9DD04DB1E5EE969009C542F /* GPSEmulatorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GPSEmulatorViewController.xib; sourceTree = "<group>"; };
+		D9DD04DE1E5EE9A6009C542F /* AMapNaviEmulatorLocations */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = AMapNaviEmulatorLocations; sourceTree = "<group>"; };
+		D9DD04DF1E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = AMapNaviEmulatorLocationsAddedTimes; sourceTree = "<group>"; };
+		D9DD04E01E5EE9A6009C542F /* GPSEmulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPSEmulator.h; sourceTree = "<group>"; };
+		D9DD04E11E5EE9A6009C542F /* GPSEmulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPSEmulator.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -836,6 +848,7 @@
 				D98F9C641E28C4330040F730 /* NaviTestViewController.h */,
 				D98F9C651E28C4330040F730 /* NaviTestViewController.m */,
 				D98F9C661E28C4330040F730 /* NaviTestViewController.xib */,
+				D9DD04D81E5EE91B009C542F /* GPSEmulator */,
 				D98F9F3B1E28CF670040F730 /* Common */,
 				D98F9C691E28C6380040F730 /* AMapNaviDriveViewX */,
 				D98F9C6F1E28C9120040F730 /* images */,
@@ -1299,6 +1312,20 @@
 			path = AMapNaviViewX;
 			sourceTree = "<group>";
 		};
+		D9DD04D81E5EE91B009C542F /* GPSEmulator */ = {
+			isa = PBXGroup;
+			children = (
+				D9DD04D91E5EE969009C542F /* GPSEmulatorViewController.h */,
+				D9DD04DA1E5EE969009C542F /* GPSEmulatorViewController.m */,
+				D9DD04DB1E5EE969009C542F /* GPSEmulatorViewController.xib */,
+				D9DD04DE1E5EE9A6009C542F /* AMapNaviEmulatorLocations */,
+				D9DD04DF1E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes */,
+				D9DD04E01E5EE9A6009C542F /* GPSEmulator.h */,
+				D9DD04E11E5EE9A6009C542F /* GPSEmulator.m */,
+			);
+			path = GPSEmulator;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1502,6 +1529,7 @@
 				D98F9DFD1E28C9120040F730 /* default_navi_footer_icon_close.png in Resources */,
 				D98F9EAD1E28C9120040F730 /* default_navi_landfront_33@3x.png in Resources */,
 				D98F9E291E28C9120040F730 /* default_navi_zoomin_normal@3x.png in Resources */,
+				D9DD04E31E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes in Resources */,
 				D98F9EA51E28C9120040F730 /* default_navi_landfront_21.png in Resources */,
 				D98F9F171E28C9120040F730 /* default_navi_action_16@3x.png in Resources */,
 				D98F9E841E28C9120040F730 /* default_navi_landback_7.png in Resources */,
@@ -1539,6 +1567,7 @@
 				D98F9F0C1E28C9120040F730 /* default_navi_action_13.png in Resources */,
 				D98F9E681E28C9120040F730 /* default_navi_hud_remain_time@3x.png in Resources */,
 				D98F9E091E28C9120040F730 /* default_navi_location_compass.png in Resources */,
+				D9DD04DD1E5EE969009C542F /* GPSEmulatorViewController.xib in Resources */,
 				D98F9E521E28C9120040F730 /* default_navi_hud_4@2x.png in Resources */,
 				D98F9EC71E28C9120040F730 /* default_navi_landfront_71@2x.png in Resources */,
 				D98F9E821E28C9120040F730 /* default_navi_landback_6@2x.png in Resources */,
@@ -1591,6 +1620,7 @@
 				D98F9E021E28C9120040F730 /* default_navi_footer_icon_more@3x.png in Resources */,
 				D98F9E221E28C9120040F730 /* default_navi_trafficbar_bg@2x.png in Resources */,
 				D98F9E271E28C9120040F730 /* default_navi_zoomin_normal.png in Resources */,
+				D9DD04E21E5EE9A6009C542F /* AMapNaviEmulatorLocations in Resources */,
 				D98F9EF51E28C9120040F730 /* default_navi_landfront_cc@3x.png in Resources */,
 				D98F9DE11E28C9120040F730 /* default_common_navibar_prev_normal@2x.png in Resources */,
 				D98F9EA81E28C9120040F730 /* default_navi_landfront_22.png in Resources */,
@@ -1780,9 +1810,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D9DD04DC1E5EE969009C542F /* GPSEmulatorViewController.m in Sources */,
 				D98F9F431E28D6490040F730 /* AMapNaviCarAnnotationViewX.m in Sources */,
 				D98F9F461E28D8BC0040F730 /* AMapNaviCarAnnotationX.m in Sources */,
 				D98F9C671E28C4330040F730 /* NaviTestViewController.m in Sources */,
+				D9DD04E41E5EE9A6009C542F /* GPSEmulator.m in Sources */,
 				D9CE843A1E4C09BA00CA5DB1 /* AMapNaviTrafficBarViewX.m in Sources */,
 				D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */,
 				D98F9C551E28C1560040F730 /* ViewController.m in Sources */,

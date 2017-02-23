@@ -1,37 +1,41 @@
 //
-//  NaviTestViewController.m
+//  GPSEmulatorViewController.m
 //  EidanAmapNaviDemo
 //
-//  Created by eidan on 17/1/13.
+//  Created by eidan on 17/2/23.
 //  Copyright © 2017年 Amap. All rights reserved.
 //
 
-#import "NaviTestViewController.h"
+#import "GPSEmulatorViewController.h"
 #import <AMapNaviKit/AMapNaviKit.h>
 #import "AMapNaviDriveViewX.h"
 
 #import "SpeechSynthesizer.h"
+#import "GPSEmulator.h"
 
-@interface NaviTestViewController ()<AMapNaviDriveManagerDelegate,AMapNaviDriveViewXDelegate>
+@interface GPSEmulatorViewController () <AMapNaviDriveManagerDelegate,AMapNaviDriveViewXDelegate>
 
 @property (nonatomic, strong) AMapNaviDriveManager *driveManager;
 
 @property (nonatomic, strong) AMapNaviPoint *startPoint;
 @property (nonatomic, strong) AMapNaviPoint *endPoint;
 
-@property (weak, nonatomic) IBOutlet AMapNaviDriveViewX *driveView;
+@property (nonatomic, weak) IBOutlet AMapNaviDriveViewX *driveView;
+
+@property (nonatomic, strong) GPSEmulator *gpsEmulator;
 
 @end
 
-@implementation NaviTestViewController
+@implementation GPSEmulatorViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //为了方便展示,选择了固定的起终点
-    self.startPoint = [AMapNaviPoint locationWithLatitude:39.993135 longitude:116.474175];
-//    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
-    self.endPoint = [AMapNaviPoint locationWithLatitude:39.996026 longitude:116.477729];  //望京西园1区
+    self.gpsEmulator = [[GPSEmulator alloc] init];
+    
+    //为了方便展示GPS模拟的结果，我们提前录制了一段GPS坐标，同时配合固定的两个点进行算路导航
+    self.startPoint = [AMapNaviPoint locationWithLatitude:39.989773 longitude:116.479872];
+    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.995839 longitude:116.451204];
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
@@ -43,7 +47,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-     [self calculateRoute];
+    [self calculateRoute];
 }
 
 //进行路径规划
@@ -63,15 +67,62 @@
     NSLog(@"------------------ VC dealloc");
 }
 
+#pragma mark - GPS Emulator
+
+//开始传入GPS模拟数据进行导航
+- (void)startGPSEmulator {
+    if ([self.gpsEmulator isSimulating])
+    {
+        NSLog(@"GPSEmulator is already running");
+        return;
+    }
+    
+    //开启使用外部GPS数据
+    [self.driveManager setEnableExternalLocation:YES];
+    
+    //开始GPS导航
+    [self.driveManager startGPSNavi];
+    
+    __weak typeof(self) weakSelf = self;
+    [self.gpsEmulator startEmulatorUsingLocationBlock:^(CLLocation *location, NSUInteger index, NSDate *addedTime, BOOL *stop) {
+        
+        //注意：需要使用当前时间作为时间戳
+        CLLocation *newLocation = [[CLLocation alloc] initWithCoordinate:location.coordinate
+                                                                altitude:location.altitude
+                                                      horizontalAccuracy:location.horizontalAccuracy
+                                                        verticalAccuracy:location.verticalAccuracy
+                                                                  course:location.course
+                                                                   speed:location.speed
+                                                               timestamp:[NSDate dateWithTimeIntervalSinceNow:0]];
+        
+        //传入GPS模拟数据
+        [weakSelf.driveManager setExternalLocation:newLocation isAMapCoordinate:NO];
+        
+//        NSLog(@"SimGPS:{%f-%f-%f-%f}", location.coordinate.latitude, location.coordinate.longitude, location.speed, location.course);
+    }];
+}
+
+//停止传入GPS模拟数据
+- (void)stopGPSEmulator {
+    [self.gpsEmulator stopEmulator];
+    
+    [self.driveManager stopNavi];
+    
+    [self.driveManager setEnableExternalLocation:NO];
+}
+
+
 #pragma mark - AMapNaviDriveViewXDelegate
 
 - (void)driveViewXCloseButtonClicked:(AMapNaviDriveViewX *)driveView {
     
     //停止导航
-    [self.driveManager stopNavi];
+    
+    [self stopGPSEmulator];
+    
     [self.driveManager removeDataRepresentative:self.driveView];
     
-    //停止语音 
+    //停止语音
     [[SpeechSynthesizer sharedSpeechSynthesizer] stopSpeak];
     
     [self.navigationController popViewControllerAnimated:YES];
@@ -89,8 +140,7 @@
 {
     NSLog(@"onCalculateRouteSuccess");
     
-    //算路成功后进行模拟导航
-    [self.driveManager startEmulatorNavi];
+    [self performSelector:@selector(startGPSEmulator) withObject:nil afterDelay:0.3];
 }
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager onCalculateRouteFailure:(NSError *)error
@@ -120,7 +170,7 @@
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager playNaviSoundString:(NSString *)soundString soundStringType:(AMapNaviSoundType)soundStringType
 {
-//    NSLog(@"playNaviSoundString:{%ld:%@}", (long)soundStringType, soundString);
+    //    NSLog(@"playNaviSoundString:{%ld:%@}", (long)soundStringType, soundString);
     
     [[SpeechSynthesizer sharedSpeechSynthesizer] speakString:soundString];
 }
@@ -134,6 +184,7 @@
 {
     NSLog(@"onArrivedDestination");
 }
+
 
 
 

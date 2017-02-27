@@ -11,6 +11,8 @@
 
 @interface AMapNaviViewUtilityX : NSObject
 
++ (double)distanceBetweenCoordinates:(AMapNaviPoint * )pointA andPoint:(AMapNaviPoint *)pointB;
+
 + (NSString *)normalizedRemainDistance:(NSInteger)remainDistance;
 
 + (NSString *)normalizedRemainTime:(NSInteger)remainTime;

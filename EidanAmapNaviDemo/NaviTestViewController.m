@@ -29,9 +29,12 @@
     [super viewDidLoad];
     
     //为了方便展示,选择了固定的起终点
-    self.startPoint = [AMapNaviPoint locationWithLatitude:39.993135 longitude:116.474175];
-//    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
-    self.endPoint = [AMapNaviPoint locationWithLatitude:39.996026 longitude:116.477729];  //望京西园1区
+//    self.startPoint = [AMapNaviPoint locationWithLatitude:40.004494 longitude:116.475924];
+////    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
+//    self.endPoint = [AMapNaviPoint locationWithLatitude:39.996794 longitude:116.48105];  //望京西园1区
+    
+    self.startPoint = [AMapNaviPoint locationWithLatitude:39.989773 longitude:116.479872];
+    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.992194 longitude:116.482474];
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
@@ -90,7 +93,7 @@
     NSLog(@"onCalculateRouteSuccess");
     
     //算路成功后进行模拟导航
-    [self.driveManager startEmulatorNavi];
+    [self.driveManager performSelector:@selector(startEmulatorNavi) withObject:nil afterDelay:3];
 }
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager onCalculateRouteFailure:(NSError *)error

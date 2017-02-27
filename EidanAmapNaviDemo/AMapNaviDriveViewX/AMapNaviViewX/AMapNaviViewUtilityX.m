@@ -14,6 +14,22 @@
 
 #pragma mark - NormailzedString
 
+#define AMAPLOC_DEG_TO_RAD      0.0174532925199432958f//0.017453292519943295769236907684886
+#define AMAPLOC_EARTH_RADIUS    6378137.0f
+
++ (double)distanceBetweenCoordinates:(AMapNaviPoint * )pointA andPoint:(AMapNaviPoint *)pointB {
+    double latitudeArc  = (pointA.latitude - pointB.latitude) * AMAPLOC_DEG_TO_RAD;
+    double longitudeArc = (pointA.longitude - pointB.longitude) * AMAPLOC_DEG_TO_RAD;
+    
+    double latitudeH = sin(latitudeArc * 0.5);
+    latitudeH *= latitudeH;
+    double lontitudeH = sin(longitudeArc * 0.5);
+    lontitudeH *= lontitudeH;
+    
+    double tmp = cos(pointA.latitude * AMAPLOC_DEG_TO_RAD) * cos(pointB.latitude*AMAPLOC_DEG_TO_RAD);
+    return AMAPLOC_EARTH_RADIUS * 2.0 * asin(sqrt(latitudeH + tmp*lontitudeH));
+}
+
 + (NSString *)normalizedRemainDistance:(NSInteger)remainDistance {
     if (remainDistance < 0) {
         return nil;

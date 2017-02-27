@@ -204,7 +204,6 @@
     //car and map move
     self.splitCount = kAMapNaviMoveCarSplitCount;
     self.needMoving = NO;
-    self.moveDirectly = YES;
     
     //private
     self.lockCarPosition = YES;
@@ -401,36 +400,34 @@
         return;
     }
     
-    
-//    // moveDirectly只有初始化的时候被设置为YES，然后车被一步到位的移动到指定位置后，就设置为No，所以这个分支最多只会执行一次
-//    if (self.moveDirectly) {
-//        double desLat = self.priorPoint.latitude + self.latOffset * self.splitCount;
-//        double desLon = self.priorPoint.longitude + self.lonOffset * self.splitCount;
-//        double desDirection = self.priorCarDirection + self.directionOffset * self.splitCount;
-//        
-//        double mapViewRotationDegree = 0;
-//        if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) { //地图方向不变，一直朝北，车头方向改变
-//            mapViewRotationDegree = 0;
-//        } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth ) {  //车头方向不变，一直朝北，地图方向改变
-//            mapViewRotationDegree = desDirection;
-//        }
-//        
-//        if (self.lockCarPosition) {
-//            [self.internalMapView setRotationDegree:mapViewRotationDegree animated:YES duration:kAMapNaviInternalAnimationDuration];  //一次性执行，animated:可设置为YES。
-//            [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(desLat, desLon) animated:YES];
-//        }
-//        
-//        [self.carAnnotation setCoordinate:CLLocationCoordinate2DMake(desLat, desLon)];
-//        [self.carAnnotationView setCarDirection:desDirection];
-//        [self.carAnnotationView setCompassDirection:0];
-//        
-//        
-//        self.stepCount = 0;
-//        self.needMoving = NO;
-//        self.moveDirectly = NO;
-//        
-//        return;
-//    }
+    //如果偏航的很远，或者导航的起点和定位点离的很远，总之就是车的实际位置和车图标相差的距离超过300米，就一步到位的跳过去，不走动画，这样更简洁.
+    if (self.moveDirectly) {
+        double desLat = self.priorPoint.latitude + self.latOffset * self.splitCount;
+        double desLon = self.priorPoint.longitude + self.lonOffset * self.splitCount;
+        double desDirection = self.priorCarDirection + self.directionOffset * self.splitCount;
+        
+        double mapViewRotationDegree = 0;
+        if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) { //地图方向不变，一直朝北，车头方向改变
+            mapViewRotationDegree = 0;
+        } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth ) {  //车头方向不变，一直朝北，地图方向改变
+            mapViewRotationDegree = desDirection;
+        }
+        
+        if (self.lockCarPosition) {
+            [self.internalMapView setRotationDegree:mapViewRotationDegree animated:YES duration:kAMapNaviInternalAnimationDuration];  //一次性执行，animated:可设置为YES。
+            [self.internalMapView setCenterCoordinate:CLLocationCoordinate2DMake(desLat, desLon) animated:YES];
+        }
+        
+        [self.carAnnotation setCoordinate:CLLocationCoordinate2DMake(desLat, desLon)];
+        [self.carAnnotationView setCarDirection:desDirection];
+        [self.carAnnotationView setCompassDirection:0];
+        
+        self.stepCount = 0;
+        self.needMoving = NO;
+        self.moveDirectly = NO;
+        
+        return;
+    }
 
     //定时器1秒14次，14次设置车的位置和方向，然后self.needMoving为NO，这边就不再走了，等到下一次“导航信息被更新了”，self.needMoving又被设置为YES了，然后这边又开始设置车的位置和方向
     if (self.stepCount++ < self.splitCount) {
@@ -468,9 +465,18 @@
         return;
     }
     
+    //上一次信息
     self.priorPoint = [AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude];
     self.priorCarDirection = self.carAnnotationView.carDirection;
     self.priorZoomLevel = self.internalMapView.zoomLevel;
+    
+    //算出上一次和这一次两点之间的距离，如果超过300米，就在timer中，让车图标一步到位，不做动画
+    double distance =[AMapNaviViewUtilityX distanceBetweenCoordinates:coordinate andPoint:self.priorPoint];
+    if (distance > kAMapNaviMoveDirectlyMaxDistance) {
+        self.moveDirectly = YES;
+    } else {
+        self.moveDirectly = NO;
+    }
     
     //每一次导航信息更新的位置等信息被拆分为14份，让1秒内的14次timer调用，每次执行加1份，动画才能顺
     self.stepCount = 0;
@@ -487,17 +493,18 @@
 
 //导航模式更新，停止导航，开始GPS导航，开始模拟导航，的时候才会调用一次
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviMode:(AMapNaviMode)naviMode {
-    NSLog(@"导航模式更新");
+//    NSLog(@"导航模式更新");
     self.currentNaviMode = naviMode;
-    self.moveDirectly = YES;
+
 }
 
 //路径信息更新：每次换路后，开始导航的时候才会调用一次(或者两次)，可用来设置这次导航路线的起点，让地图的初始位置正确，电子眼的初始化
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviRoute:(AMapNaviRoute *)naviRoute {
     
-    NSLog(@"路径信息更新");
+//    NSLog(@"路径信息更新,%@",naviRoute);
     
     self.currentNaviRoute = naviRoute;
+    
     
     //画出规划的路径，一般在这里画的路径都是不带路况信息，因为路况信息的回调还没调用。
     [self updateRoutePolyline];
@@ -513,12 +520,15 @@
     
     //更新转向箭头，这里的显示与否有取决于zoomLevel,所以必须在changeToNaviModeAtPoint先把zoomLebel设定对了，再执行这个函数，第一个路口才会有箭头，而且changeToNaviModeAtPoint里面setZoomLevel不能有动画
     [self updateRouteTurnArrowPolylineWithSegmentIndex:0];
-
+    
+    //初始化一下，让一有路径信息，就有自车图标
+    [self carAnnotation];
+    
 }
 
 //导航实时信息更新，如果是模拟导航，自车位置开始一段时间后，就不再更新，但是导航实时信息一直在更新，所以模拟导航以这个回调为准
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviInfo:(AMapNaviInfo *)naviInfo {
-//    NSLog(@"导航信息更新");
+//    NSLog(@"导航信息更新,%@",naviInfo);
     
     //第一次没有self.currentNaviInfo需要，上一次导航信息的摄像头索引和这次的不一样也需要。
     BOOL isNeedUpdateCamera = self.currentNaviInfo ? (self.currentNaviInfo.cameraIndex != naviInfo.cameraIndex) : YES;
@@ -555,27 +565,17 @@
         [self.carAnnotationView.superview bringSubviewToFront:self.carAnnotationView];
     }
     
-//    //更新地图显示
-//    if (self.currentNaviMode == AMapNaviModeEmulator) {
-//        //因为初始化的时候self.moveDirectly设置为YES，timer中会直接一步到位的把车的位置和方向设置对了，比如导航开始的点在天安门，而你在望京，一步到位，如果走1秒14次的地图和车的变化，会很拖拉，用户会不知所云
-//        //这边需要算一下车图标目前的位置和实际开始导航的起点的位置的距离，如果在300米以内，就将moveDirectly设置为NO，表示，timer中不需要一步到位，1秒14次的动画平移效果挺好的。
-//        if (self.moveDirectly) {
-//            double distance = [AMapNaviViewUtilityX calcDistanceBetweenPoint:self.currentNaviInfo.carCoordinate andPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
-//            if (distance <= kAMapNaviMoveDirectlyMaxDistance && distance > kAMapNaviMoveDirectlyMinDistance) {
-//                self.moveDirectly = NO;
-//            }
-//        }
-//    }
-    
     //每一次导航信息更新后，都算一下，车应该以什么样的角度显示在地图的哪个地方，needMoving 设置为YES。
-    //不管是模拟导航，GPS导航，还是None（比如巡航），导航信息更新，都会返回目前系统检测到的最新的自车位置，那么地图上的车图标就要跟着更新到这个位置
-    [self moveCarAnnotationToCoordinate:self.currentNaviInfo.carCoordinate direction:self.currentNaviInfo.carDirection zoomLevel:kAMapNaviLockStateZoomLevel];
+    if (self.currentNaviMode == AMapNaviModeEmulator) {
+        [self moveCarAnnotationToCoordinate:self.currentNaviInfo.carCoordinate direction:self.currentNaviInfo.carDirection zoomLevel:kAMapNaviLockStateZoomLevel];
+    }
+    
 }
 
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviLocation:(AMapNaviLocation *)naviLocation {
     
-    NSLog(@"自车位置更新,%@",naviLocation.coordinate);
+//    NSLog(@"自车位置更新,%@",naviLocation.coordinate);
     
     self.currentCarLocation = naviLocation;
     
@@ -583,11 +583,15 @@
         return;
     }
     
-//    //正在GPS导航或者没有导航，比如巡航，只要车的位置改变，需要对车的图标进行移动，目前不处理，因为导航信息更新回调统一处理了
-//    if (self.currentNaviMode == AMapNaviModeGPS || self.currentNaviMode == AMapNaviModeNone) {
-//        
-//    }
+    //正在GPS导航或者没有导航，只要车的位置改变，需要对车的图标进行移动
+    if (self.currentNaviMode == AMapNaviModeGPS || self.currentNaviMode == AMapNaviModeNone) {
+         [self moveCarAnnotationToCoordinate:self.currentCarLocation.coordinate direction:self.currentCarLocation.heading zoomLevel:kAMapNaviLockStateZoomLevel];
+    }
     
+}
+
+- (void)setMoveDirectly:(BOOL)moveDirectly {
+    _moveDirectly = moveDirectly;
 }
 
 //路况信息更新
@@ -651,16 +655,20 @@
         
         AMapNaviPoint *coordinate = nil;
         
-//        if (self.currentCarLocation) {  //自车位置更新后，有了位置，才能添加车标注
+
+//        //如果这样处理，因为manager里面，init的时候就开始定位，导致初始化就有位置，carAnnotation就会很快就被画在真正定位的位置，如果导航的起点设置在离目前定位点很远的地方，没办法实现像高德地图或者百度一样，车的图标在导航的起点。
+//        if (self.currentNaviMode == AMapNaviModeEmulator) {
+//            coordinate = self.currentNaviInfo.carCoordinate;
+//        } else {
 //            coordinate = self.currentCarLocation.coordinate;
 //        }
         
-        //高德地图和百度地图，如果导航的起点设置在离目前定位点很远的地方，是直接跳到导航起点开始导航，跟目前定位点一点关系都没有
-        //所以我们不取自车位置，直接取导航信息中的车的位置self.currentNaviInfo.carCoordinate，初始化carAnnotation的时候，self.currentNaviInfo.carCoordinate刚开始，是很接近起点的
-        if (self.currentNaviInfo) {
-             coordinate = self.currentNaviInfo.carCoordinate;
+        //高德地图和百度地图，如果导航的起点设置在离目前定位点很远的地方，是直接跳到导航起点开始导航，但是只要一移动(自车位置一回调)，车图标就会定位到当前位置，并触发偏航重算。所以我们先把车的初始位置放在起点，然后GPS导航中，自车位置从自车位置回调中取，模拟导航中，自车位置从导航信息回调中取
+        if (self.currentNaviRoute.routeStartPoint) {
+            coordinate = self.currentNaviRoute.routeStartPoint;
         }
-        
+
+        //如果 coordinate还是为nil，就先等着，车的图标一定要等到有一个有效的位置，才可以画出来
         if (coordinate == nil) {
             return nil;
         }
@@ -863,11 +871,11 @@
     
     [self removeNaviRoutePointAnnotation];
     
-    //StartPoint
-    AMapNaviPoint *startPoint = self.currentNaviRoute.routeStartPoint;
-    CLLocationCoordinate2D start = CLLocationCoordinate2DMake(startPoint.latitude, startPoint.longitude);
-    AMapNaviStartPointAnnotationX *startAnnotation = [[AMapNaviStartPointAnnotationX alloc] initWithCoordinate:start];
-    [self.internalMapView addAnnotation:startAnnotation];
+//    //StartPoint
+//    AMapNaviPoint *startPoint = self.currentNaviRoute.routeStartPoint;
+//    CLLocationCoordinate2D start = CLLocationCoordinate2DMake(startPoint.latitude, startPoint.longitude);
+//    AMapNaviStartPointAnnotationX *startAnnotation = [[AMapNaviStartPointAnnotationX alloc] initWithCoordinate:start];
+//    [self.internalMapView addAnnotation:startAnnotation];
     
     //EndPoint
     AMapNaviPoint *endPoint = self.currentNaviRoute.routeEndPoint;

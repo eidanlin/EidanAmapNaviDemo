@@ -34,7 +34,10 @@
     self.gpsEmulator = [[GPSEmulator alloc] init];
     
     //为了方便展示GPS模拟的结果，我们提前录制了一段GPS坐标，同时配合固定的两个点进行算路导航
-    self.startPoint = [AMapNaviPoint locationWithLatitude:39.989773 longitude:116.479872];
+    self.startPoint = [AMapNaviPoint locationWithLatitude:40.080603 longitude:116.602853];  //机场
+//    self.startPoint = [AMapNaviPoint locationWithLatitude:39.989773 longitude:116.479872];
+//    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.992194 longitude:116.482474];
+//    self.endPoint = [AMapNaviPoint locationWithLatitude:39.992405 longitude:116.482665];
     self.endPoint   = [AMapNaviPoint locationWithLatitude:39.995839 longitude:116.451204];
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
@@ -108,7 +111,7 @@
     
     [self.driveManager stopNavi];
     
-    [self.driveManager setEnableExternalLocation:NO];
+//    [self.driveManager setEnableExternalLocation:NO];
 }
 
 
@@ -140,7 +143,7 @@
 {
     NSLog(@"onCalculateRouteSuccess");
     
-    [self performSelector:@selector(startGPSEmulator) withObject:nil afterDelay:0.3];
+    [self performSelector:@selector(startGPSEmulator) withObject:nil afterDelay:5];
 }
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager onCalculateRouteFailure:(NSError *)error
@@ -183,6 +186,7 @@
 - (void)driveManagerOnArrivedDestination:(AMapNaviDriveManager *)driveManager
 {
     NSLog(@"onArrivedDestination");
+    [self stopGPSEmulator];
 }
 
 

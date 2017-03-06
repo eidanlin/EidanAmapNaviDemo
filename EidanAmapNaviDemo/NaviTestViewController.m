@@ -93,8 +93,8 @@
     NSLog(@"onCalculateRouteSuccess");
     
     //算路成功后进行模拟导航
-    [self.driveManager startEmulatorNavi];
-//    [self.driveManager performSelector:@selector(startEmulatorNavi) withObject:nil afterDelay:3];
+//    [self.driveManager startEmulatorNavi];
+    [self.driveManager performSelector:@selector(startEmulatorNavi) withObject:nil afterDelay:3];
 }
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager onCalculateRouteFailure:(NSError *)error

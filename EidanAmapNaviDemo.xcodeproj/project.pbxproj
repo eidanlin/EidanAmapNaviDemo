@@ -11,6 +11,7 @@
 		D93C940E1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C940D1E2E4F05003152CD /* AMapNaviRouteAnnotationX.m */; };
 		D93C94111E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */; };
 		D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */; };
+		D952C8881E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D952C8871E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png */; };
 		D98F9C4F1E28C1560040F730 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C4E1E28C1560040F730 /* main.m */; };
 		D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C511E28C1560040F730 /* AppDelegate.m */; };
 		D98F9C551E28C1560040F730 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C541E28C1560040F730 /* ViewController.m */; };
@@ -387,6 +388,7 @@
 		D9DD04E21E5EE9A6009C542F /* AMapNaviEmulatorLocations in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04DE1E5EE9A6009C542F /* AMapNaviEmulatorLocations */; };
 		D9DD04E31E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04DF1E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes */; };
 		D9DD04E41E5EE9A6009C542F /* GPSEmulator.m in Sources */ = {isa = PBXBuildFile; fileRef = D9DD04E11E5EE9A6009C542F /* GPSEmulator.m */; };
+		D9DD04E81E6D8AD9009C542F /* default_navi_new_location@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9DD04E71E6D8AD9009C542F /* default_navi_new_location@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -399,6 +401,7 @@
 		D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationViewX.m; sourceTree = "<group>"; };
 		D93C94151E2F1F89003152CD /* AMapNaviRoutePolylineX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRoutePolylineX.h; sourceTree = "<group>"; };
 		D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRoutePolylineX.m; sourceTree = "<group>"; };
+		D952C8871E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_carlocation_compass@2x.png"; sourceTree = "<group>"; };
 		D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EidanAmapNaviDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D98F9C4E1E28C1560040F730 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D98F9C501E28C1560040F730 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -788,6 +791,7 @@
 		D9DD04DF1E5EE9A6009C542F /* AMapNaviEmulatorLocationsAddedTimes */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = AMapNaviEmulatorLocationsAddedTimes; sourceTree = "<group>"; };
 		D9DD04E01E5EE9A6009C542F /* GPSEmulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPSEmulator.h; sourceTree = "<group>"; };
 		D9DD04E11E5EE9A6009C542F /* GPSEmulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPSEmulator.m; sourceTree = "<group>"; };
+		D9DD04E71E6D8AD9009C542F /* default_navi_new_location@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_new_location@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -892,6 +896,8 @@
 				D98F9C741E28C9120040F730 /* custtexture_serious.png */,
 				D98F9C751E28C9120040F730 /* custtexture_slow.png */,
 				D98F9C761E28C9120040F730 /* default_common_navibar_prev_highlighted.png */,
+				D9DD04E71E6D8AD9009C542F /* default_navi_new_location@2x.png */,
+				D952C8871E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png */,
 				D98F9C771E28C9120040F730 /* default_common_navibar_prev_highlighted@2x.png */,
 				D98F9C781E28C9120040F730 /* default_common_navibar_prev_highlighted@3x.png */,
 				D98F9C791E28C9120040F730 /* default_common_navibar_prev_normal.png */,
@@ -1723,6 +1729,7 @@
 				D98F9EB31E28C9120040F730 /* default_navi_landfront_43@3x.png in Resources */,
 				D98F9E741E28C9120040F730 /* default_navi_landback_1@3x.png in Resources */,
 				D98F9DDA1E28C9120040F730 /* custtexture_no.png in Resources */,
+				D952C8881E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png in Resources */,
 				D98F9E671E28C9120040F730 /* default_navi_hud_remain_time@2x.png in Resources */,
 				D98F9F341E28C9130040F730 /* default_navi_action_7@3x.png in Resources */,
 				D98F9E541E28C9120040F730 /* default_navi_hud_5.png in Resources */,
@@ -1752,6 +1759,7 @@
 				D98F9E211E28C9120040F730 /* default_navi_trafficbar_bg.png in Resources */,
 				D98F9E3A1E28C9120040F730 /* default_navi_hud_14@2x.png in Resources */,
 				D98F9E041E28C9120040F730 /* default_navi_lan_close_normal@2x.png in Resources */,
+				D9DD04E81E6D8AD9009C542F /* default_navi_new_location@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

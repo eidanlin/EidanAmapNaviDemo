@@ -9,8 +9,8 @@
 #import "AMapNaviCarAnnotationViewX.h"
 #import "AMapNaviViewUtilityX.h"
 
-#define kCarAnnotationViewCarImage      @"default_navi_car_icon"
-#define kCarAnnotationViewCompassImage  @"default_navi_location_compass"
+#define kCarAnnotationViewCarImage      @"default_navi_new_location"
+#define kCarAnnotationViewCompassImage  @"default_navi_carlocation_compass"
 
 @interface AMapNaviCarAnnotationViewX ()
 
@@ -41,21 +41,19 @@
 }
 
 - (UIImageView *)carImageView {
-    if (_carImageView == nil)
-    {
+    if (_carImageView == nil) {
         UIImage *carImage = [UIImage imageNamed:kCarAnnotationViewCarImage];
         
         _carImageView = [[UIImageView alloc] initWithImage:carImage];
         
-        [_carImageView setFrame:CGRectMake(0, 0, 60, 60)];
+        [_carImageView setFrame:CGRectMake(0, 0, 35, 35)];
         [_carImageView setCenter:CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds))];
     }
     return _carImageView;
 }
 
 - (UIImageView *)compassImageView {
-    if (_compassImageView == nil)
-    {
+    if (_compassImageView == nil) {
         UIImage *compassImage = [UIImage imageNamed:kCarAnnotationViewCompassImage];
         
         _compassImageView = [[UIImageView alloc] initWithImage:compassImage];

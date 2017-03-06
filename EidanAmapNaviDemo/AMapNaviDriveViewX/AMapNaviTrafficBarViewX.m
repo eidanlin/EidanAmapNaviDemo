@@ -8,7 +8,7 @@
 
 #import "AMapNaviTrafficBarViewX.h"
 
-#define AMapNaviTrafficBarViewRGBA(R, G, B)   [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:0.8]
+#define AMapNaviTrafficBarViewRGBA(R, G, B)   [UIColor colorWithRed:R/255.0 green:G/255.0 blue:B/255.0 alpha:0.9]
 
 @interface AMapNaviTrafficBarViewX ()
 
@@ -69,7 +69,7 @@
     //边界要外扩，边界线的内边贴着self这个view的实际区域，外边直接超出了view，这样整个view的高度才是一个有效的总高度，以这个高度来计算百分比，比较方便，不用额外的减边界的宽度
     float outterBorderWidth = 3;
     float outterBorderOffset = outterBorderWidth / 2;
-    UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:4];
+    UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:8];
     
     CAShapeLayer *outterBorderLayer = [self createShapeLayr:outterBorderWidth andStrokeColor:AMapNaviTrafficBarViewRGBA(255, 255, 255)];
     outterBorderLayer.path = outterPath.CGPath;
@@ -83,23 +83,23 @@
     [self addSubview:self.carImageView];
     
     //未知
-    CAShapeLayer *trafficStatusUnknowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(26, 166, 239)];
+    CAShapeLayer *trafficStatusUnknowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(142, 206, 253)];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusUnknowLayer];
     
     //顺畅
-    CAShapeLayer *trafficStatusSmoothLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(65, 223, 16)];
+    CAShapeLayer *trafficStatusSmoothLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(27, 184, 46)];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSmoothLayer];
     
     //缓慢
-    CAShapeLayer *trafficStatusSlowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(255, 255, 0)];
+    CAShapeLayer *trafficStatusSlowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(253, 185, 44)];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSlowLayer];
     
     //堵塞
-    CAShapeLayer *trafficStatusJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(255, 0, 0)];
+    CAShapeLayer *trafficStatusJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(240, 34, 43)];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusJamLayer];
     
     //严重堵塞
-    CAShapeLayer *trafficStatusSeriousJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(160, 8, 8)];
+    CAShapeLayer *trafficStatusSeriousJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(166, 14, 22)];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSeriousJamLayer];
     
     self.trafficStatusLayerArray = @[trafficStatusUnknowLayer, trafficStatusSmoothLayer, trafficStatusSlowLayer, trafficStatusJamLayer, trafficStatusSeriousJamLayer];

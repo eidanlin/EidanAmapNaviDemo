@@ -35,7 +35,7 @@
 
 //views
 #define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
-#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:40/255.0 green:44/255.0 blue:55/255.0 alpha:0.85]
+#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:37/255.0 green:45/255.0 blue:55/255.0 alpha:0.85]
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
 
@@ -227,7 +227,6 @@
 - (void)setShowTrafficLayer:(BOOL)showTrafficLayer {
     _showTrafficLayer = showTrafficLayer;
     self.internalMapView.showTraffic = showTrafficLayer;
-    [self updateRoutePolyline];  //重绘路径
 }
 
 - (void)setLineWidth:(CGFloat)lineWidth {
@@ -590,10 +589,6 @@
     
 }
 
-- (void)setMoveDirectly:(BOOL)moveDirectly {
-    _moveDirectly = moveDirectly;
-}
-
 //路况信息更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateTrafficStatus:(NSArray<AMapNaviTrafficStatus *> *)trafficStatus {
 //    NSLog(@"路况信息更新");
@@ -605,10 +600,8 @@
         [self.rightTrafficBarView updateBarWithTrafficStatuses:trafficStatus];
     }
     
-    //需要显示带路况
-    if (self.showTrafficLayer) {
-        [self updateRoutePolyline]; //如果路况信息更新了，带拥堵情况路径也要重新画，有了路况信息，才能画带路况的。
-    }
+    [self updateRoutePolyline]; //如果路况信息更新了，就要重画
+    
 }
 
 //需要显示路口放大图了
@@ -1054,15 +1047,15 @@
     
     [self removeRoutePolyline];
     
-    if (self.showTrafficLayer && self.trafficStatus.count) {  //有路况信息，才能显示带路况的路径
+    if (self.trafficStatus.count) {  //有路况信息，才能显示带路况的路径
         [self addRoutePolylineWithTrafficStatus];
     } else {
         [self addRoutePolylineWithoutTrafficStatus];
     }
     
-    if (self.currentNaviInfo) {  //为了让转弯箭头在路径上层，不被遮挡，每次更新路径，都要让转弯箭头重新画
-        [self updateRouteTurnArrowPolylineWithSegmentIndex:self.currentNaviInfo.currentSegmentIndex];
-    }
+    //为了让转弯箭头在路径上层，不被遮挡，每次更新路径，都要让转弯箭头重新画，如果self.currentNaviInfo为nil，则索引为0
+    [self updateRouteTurnArrowPolylineWithSegmentIndex:self.currentNaviInfo.currentSegmentIndex];
+    
 }
 
 - (void)removeRoutePolyline {
@@ -1262,8 +1255,8 @@
         
         MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:overlay];
         
-        polylineRenderer.strokeColor = [UIColor colorWithRed:87.0/255.0 green:235.0/255.0 blue:204.0/255.0 alpha:1.0];
-        polylineRenderer.lineWidth = 10.0f;
+        polylineRenderer.strokeColor = [UIColor colorWithRed:49.0/255.0 green:168.0/255.0 blue:249.0/255.0 alpha:1.0];
+        polylineRenderer.lineWidth = 12.0f;
         polylineRenderer.lineCapType = kMALineCapArrow;
         
         return polylineRenderer;

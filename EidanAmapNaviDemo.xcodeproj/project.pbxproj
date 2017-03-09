@@ -12,6 +12,7 @@
 		D93C94111E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94101E2E50C8003152CD /* AMapNaviRouteAnnotationViewX.m */; };
 		D93C94171E2F1F89003152CD /* AMapNaviRoutePolylineX.m in Sources */ = {isa = PBXBuildFile; fileRef = D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */; };
 		D952C8881E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D952C8871E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png */; };
+		D952C88A1E7101A70076E82F /* AMapNaviKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D952C8891E7101A70076E82F /* AMapNaviKit.podspec */; };
 		D98F9C4F1E28C1560040F730 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C4E1E28C1560040F730 /* main.m */; };
 		D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C511E28C1560040F730 /* AppDelegate.m */; };
 		D98F9C551E28C1560040F730 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C541E28C1560040F730 /* ViewController.m */; };
@@ -402,6 +403,7 @@
 		D93C94151E2F1F89003152CD /* AMapNaviRoutePolylineX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRoutePolylineX.h; sourceTree = "<group>"; };
 		D93C94161E2F1F89003152CD /* AMapNaviRoutePolylineX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRoutePolylineX.m; sourceTree = "<group>"; };
 		D952C8871E6D8B8D0076E82F /* default_navi_carlocation_compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_carlocation_compass@2x.png"; sourceTree = "<group>"; };
+		D952C8891E7101A70076E82F /* AMapNaviKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AMapNaviKit.podspec; sourceTree = "<group>"; };
 		D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EidanAmapNaviDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D98F9C4E1E28C1560040F730 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D98F9C501E28C1560040F730 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -826,6 +828,7 @@
 		D98F9C411E28C1560040F730 = {
 			isa = PBXGroup;
 			children = (
+				D952C8891E7101A70076E82F /* AMapNaviKit.podspec */,
 				D98F9C4C1E28C1560040F730 /* EidanAmapNaviDemo */,
 				D98F9C4B1E28C1560040F730 /* Products */,
 				71BC035D0492BC6B060B44EE /* Pods */,
@@ -1477,6 +1480,7 @@
 				D98F9ED81E28C9120040F730 /* default_navi_landfront_99.png in Resources */,
 				D98F9ED91E28C9120040F730 /* default_navi_landfront_99@2x.png in Resources */,
 				D98F9DEF1E28C9120040F730 /* default_navi_camera.png in Resources */,
+				D952C88A1E7101A70076E82F /* AMapNaviKit.podspec in Resources */,
 				D98F9E421E28C9120040F730 /* default_navi_hud_17.png in Resources */,
 				D98F9EFD1E28C9120040F730 /* default_navi_landfront_e5@2x.png in Resources */,
 				D98F9DD81E28C9120040F730 /* custtexture_bad.png in Resources */,

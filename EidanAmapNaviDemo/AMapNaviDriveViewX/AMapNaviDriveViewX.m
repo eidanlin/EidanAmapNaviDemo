@@ -67,6 +67,7 @@
 @property (nonatomic, assign) AMapNaviMode currentNaviMode;
 @property (nonatomic, copy) AMapNaviLocation *currentCarLocation;
 @property (nonatomic, copy) AMapNaviInfo *currentNaviInfo;      //当前正在导航的这一个时间点的导航具体信息，会快速的变化
+@property (nonatomic, copy) NSArray<AMapNaviCameraInfo *> *cameraInfos;
 @property (nonatomic, copy) AMapNaviRoute *currentNaviRoute;  //当前需要导航的的一整条路径的信息，开始导航后，就不再改变
 @property (nonatomic, copy) NSArray <AMapNaviTrafficStatus *> *trafficStatus;  //前方交通路况信息(长度和拥堵情况)
 
@@ -530,7 +531,6 @@
 //    NSLog(@"导航信息更新,%@",naviInfo);
     
     //第一次没有self.currentNaviInfo需要，上一次导航信息的摄像头索引和这次的不一样也需要。
-    BOOL isNeedUpdateCamera = self.currentNaviInfo ? (self.currentNaviInfo.cameraIndex != naviInfo.cameraIndex) : YES;
     BOOL isNeedUpdateTurnArrow = self.currentNaviInfo ? (self.currentNaviInfo.currentSegmentIndex != naviInfo.currentSegmentIndex) : YES;
     
     self.currentNaviInfo = naviInfo;
@@ -538,17 +538,11 @@
     //InfoView
     [self updateTopInfoView];
     [self updateBottomInfoView];
-    [self updateLeftCameraAndSpeedView];
     
     //更新光柱中车的位置
     if (self.currentNaviRoute.routeLength > 0 && self.currentNaviInfo) {
         double remainPercent = (double)self.currentNaviInfo.routeRemainDistance / self.currentNaviRoute.routeLength;
         [self.rightTrafficBarView updateCarPositionWithRouteRemainPercent:remainPercent];
-    }
-    
-    //每路过一个电子眼后，“导航信息更新”这个回调就会被触发调用一次，cameraIndex也会不一样，就需要更新电子眼信息。
-    if (isNeedUpdateCamera) {
-        [self updateRouteCameraAnnotationWithStartIndex:self.currentNaviInfo.cameraIndex];
     }
     
     //每路过一个转弯，“导航信息更新”这个回调就会被触发调用一次，currentSegmentIndex也会不一样，就需要更新转弯信息，每一个Segment就是一个个转弯分割的
@@ -564,11 +558,13 @@
         [self.carAnnotationView.superview bringSubviewToFront:self.carAnnotationView];
     }
     
-    //每一次导航信息更新后，都算一下，车应该以什么样的角度显示在地图的哪个地方，needMoving 设置为YES。
-    if (self.currentNaviMode == AMapNaviModeEmulator) {
-        [self moveCarAnnotationToCoordinate:self.currentNaviInfo.carCoordinate direction:self.currentNaviInfo.carDirection zoomLevel:kAMapNaviLockStateZoomLevel];
-    }
-    
+}
+
+//电子眼信息更新
+- (void)driveManager:(AMapNaviDriveManager *)driveManager updateCameraInfos:(NSArray<AMapNaviCameraInfo *> *)cameraInfos {
+    self.cameraInfos = cameraInfos;
+    [self updateRouteCameraAnnotationWithCameraInfos:cameraInfos];
+    [self updateLeftCameraAndSpeedView];
 }
 
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
@@ -582,10 +578,8 @@
         return;
     }
     
-    //正在GPS导航或者没有导航，只要车的位置改变，需要对车的图标进行移动
-    if (self.currentNaviMode == AMapNaviModeGPS || self.currentNaviMode == AMapNaviModeNone) {
-         [self moveCarAnnotationToCoordinate:self.currentCarLocation.coordinate direction:self.currentCarLocation.heading zoomLevel:kAMapNaviLockStateZoomLevel];
-    }
+    //车的位置改变，需要对车的图标进行移动
+    [self moveCarAnnotationToCoordinate:self.currentCarLocation.coordinate direction:self.currentCarLocation.heading zoomLevel:kAMapNaviLockStateZoomLevel];
     
 }
 
@@ -775,21 +769,24 @@
 
 - (void)updateLeftCameraAndSpeedView {
     
-    //限速也是电子眼信息中的
-    if (self.currentNaviInfo.cameraDistance > 0) {
+    AMapNaviCameraInfo *aCameraInfo = self.cameraInfos.firstObject;
+    
+    if (aCameraInfo.distance > 0) {
         
-        if (self.currentNaviInfo.cameraType == 0 && self.currentNaviInfo.cameraLimitSpeed > 0) {  //cameraType 0为测速摄像头，且有限速
-            self.leftSpeedInfoLabel.text = [NSString stringWithFormat:@"%ld",(long)self.currentNaviInfo.cameraLimitSpeed];
+        if (aCameraInfo.cameraType == 0 && aCameraInfo.cameraSpeed > 0) {  //cameraType 0为测速摄像头，且有限速
+            self.leftSpeedInfoLabel.text = [NSString stringWithFormat:@"%ld",(long)aCameraInfo.cameraSpeed];
             self.leftSpeedInfoView.hidden = NO;
             self.leftCameraInfoView.hidden = YES;
-        } else if (self.currentNaviInfo.cameraType >= 1) {  //监控摄像头
-            NSString *imageName = self.currentNaviInfo.cameraType == 1 ? @"default_navi_camera" : @"default_navi_camera_content_normal";
+        } else if (aCameraInfo.cameraType >= 1) {  //监控摄像头
+            NSString *imageName = aCameraInfo.cameraType == 1 ? @"default_navi_camera" : @"default_navi_camera_content_normal";
             self.leftCameraInfoImageView.image = [UIImage imageNamed:imageName];
             self.leftSpeedInfoView.hidden = YES;
             self.leftCameraInfoView.hidden = NO;
         }
         
-    } else {  //电子眼距离(<=0 为没有电子眼或距离很远)
+    } else {
+        //如果没有摄像头信息，即aCameraInfo为nil，不能return回去，要让其走这个分支，这样会把之前有的摄像头隐藏掉，否则会出现最后一个摄像头已经过去了，左上角还会有图标。
+        //电子眼距离<=0 为没有电子眼或距离很远
         self.leftCameraInfoView.hidden = self.leftSpeedInfoView.hidden = YES;
     }
 }
@@ -897,6 +894,7 @@
 
 #pragma mark - 更新电子眼信息
 
+///刚选择路径的时候，画出前2个
 - (void)updateRouteCameraAnnotationWithStartIndex:(NSInteger)startIndex {
     
     [self removeRouteCameraAnnotation];  //每次更新前，先全部移除所有电子眼
@@ -909,6 +907,22 @@
         AMapNaviCameraAnnotationX *anno = [AMapNaviCameraAnnotationX new];
         [anno setCoordinate:CLLocationCoordinate2DMake(aCamera.coordinate.latitude, aCamera.coordinate.longitude)];
         [self.internalMapView addAnnotation:anno];
+        
+        index++;
+    }
+}
+
+- (void)updateRouteCameraAnnotationWithCameraInfos:(NSArray <AMapNaviCameraInfo *> *)cameraInfos
+{
+    [self removeRouteCameraAnnotation];  //如果数组为空，也是先移除，再return回去，因为数组为空，就是代表你刚路过完一个摄像头，要把其从地图上移除
+    
+    int index = 0;
+    while (index < cameraInfos.count && index < 2) { //只更新当前的电子眼信息，和当前的下一个，每次更新，只更新最近的这两个
+        AMapNaviCameraInfo *aCamera = [cameraInfos objectAtIndex:index];
+        
+        AMapNaviCameraAnnotationX *ann = [[AMapNaviCameraAnnotationX alloc] init];
+        [ann setCoordinate:CLLocationCoordinate2DMake(aCamera.coordinate.latitude, aCamera.coordinate.longitude)];
+        [self.internalMapView addAnnotation:ann];
         
         index++;
     }

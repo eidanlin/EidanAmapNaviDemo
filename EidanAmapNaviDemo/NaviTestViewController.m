@@ -129,6 +129,10 @@
     [[SpeechSynthesizer sharedSpeechSynthesizer] speakString:soundString];
 }
 
+- (BOOL)driveManagerIsNaviSoundPlaying:(AMapNaviDriveManager *)driveManager {
+    return [[SpeechSynthesizer sharedSpeechSynthesizer] isSpeaking];
+}
+
 - (void)driveManagerDidEndEmulatorNavi:(AMapNaviDriveManager *)driveManager
 {
     NSLog(@"didEndEmulatorNavi");

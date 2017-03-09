@@ -171,12 +171,16 @@
     NSLog(@"onArrivedWayPoint:%d", wayPointIndex);
 }
 
-- (void)driveManager:(AMapNaviDriveManager *)driveManager playNaviSoundString:(NSString *)soundString soundStringType:(AMapNaviSoundType)soundStringType
-{
+- (void)driveManager:(AMapNaviDriveManager *)driveManager playNaviSoundString:(NSString *)soundString soundStringType:(AMapNaviSoundType)soundStringType {
     //    NSLog(@"playNaviSoundString:{%ld:%@}", (long)soundStringType, soundString);
     
     [[SpeechSynthesizer sharedSpeechSynthesizer] speakString:soundString];
 }
+
+- (BOOL)driveManagerIsNaviSoundPlaying:(AMapNaviDriveManager *)driveManager {
+    return [[SpeechSynthesizer sharedSpeechSynthesizer] isSpeaking];
+}
+
 
 - (void)driveManagerDidEndEmulatorNavi:(AMapNaviDriveManager *)driveManager
 {

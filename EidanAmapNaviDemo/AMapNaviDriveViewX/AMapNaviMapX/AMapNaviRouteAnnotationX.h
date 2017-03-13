@@ -7,10 +7,23 @@
 //
 
 #import <MAMapKit/MAAnnotation.h>
+#import <AMapNaviKit/AMapNaviKit.h>
 
 @interface AMapNaviCameraAnnotationX : NSObject <MAAnnotation>
 
 @property (nonatomic, assign) CLLocationCoordinate2D coordinate;
+
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate;
+
+@end
+
+@interface AMapNaviCameraTypeAnnotationX : NSObject <MAAnnotation>
+
+@property (nonatomic, assign) CLLocationCoordinate2D coordinate;
+
+@property (nonatomic, strong) AMapNaviCameraInfo *cameraInfo;
+
+@property (nonatomic, assign) int index;
 
 - (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate;
 
@@ -39,6 +52,8 @@
 - (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate;
 
 @end
+
+
 
 
 

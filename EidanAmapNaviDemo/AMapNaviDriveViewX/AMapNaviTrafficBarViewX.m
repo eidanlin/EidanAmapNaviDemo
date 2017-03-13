@@ -71,7 +71,7 @@
     float outterBorderOffset = outterBorderWidth / 2;
     UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:8];
     
-    CAShapeLayer *outterBorderLayer = [self createShapeLayr:outterBorderWidth andStrokeColor:AMapNaviTrafficBarViewRGBA(255, 255, 255)];
+    CAShapeLayer *outterBorderLayer = [self createShapeLayr:outterBorderWidth andStrokeColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:1]];
     outterBorderLayer.path = outterPath.CGPath;
     outterBorderLayer.zPosition = 1;
     [self.layer addSublayer:outterBorderLayer];
@@ -116,8 +116,8 @@
     //位置再减去1，是因为车的图没切好，离了1个像素的空白，如果顶着边切，就不用减去1
     self.carImageView.frame = CGRectMake(self.carImageView.frame.origin.x, self.bounds.size.height * lastRemainPercent - 1, self.carImageView.frame.size.width, self.carImageView.frame.size.height);
     
-    //+2也是图片没有切好的后遗症，为了不让灰色跑在车前面，灰色要往下微调
-    self.greyLayer.frame = CGRectMake(0, self.carImageView.frame.origin.y + 2, self.bounds.size.width, self.bounds.size.height - self.carImageView.frame.origin.y - 2);
+    //+1也是图片没有切好的后遗症，为了不让灰色跑在车前面，灰色要往下微调
+    self.greyLayer.frame = CGRectMake(0, self.carImageView.frame.origin.y + 1, self.bounds.size.width, self.bounds.size.height - self.carImageView.frame.origin.y - 1);
     
     //高度逐渐变小
     self.trafficStatusesContainerLayer.frame = CGRectMake(0, 0, self.bounds.size.width, self.greyLayer.frame.origin.y);

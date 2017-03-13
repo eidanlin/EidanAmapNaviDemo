@@ -29,15 +29,13 @@
     [super viewDidLoad];
     
     //为了方便展示,选择了固定的起终点
-    self.startPoint = [AMapNaviPoint locationWithLatitude:40.004494 longitude:116.475924];
+    self.startPoint = [AMapNaviPoint locationWithLatitude:39.895045 longitude:116.321679];
     self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
-//    self.endPoint = [AMapNaviPoint locationWithLatitude:39.996794 longitude:116.48105];  //望京西园1区
-    
-//    self.startPoint = [AMapNaviPoint locationWithLatitude:39.989773 longitude:116.479872];
-//    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.992194 longitude:116.482474];
+    self.endPoint = [AMapNaviPoint locationWithLatitude:40.080603 longitude:116.602853];  //望京西园1区
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
+    [self.driveManager setEmulatorNaviSpeed:120];
     
     self.driveView.delegate = self;
     

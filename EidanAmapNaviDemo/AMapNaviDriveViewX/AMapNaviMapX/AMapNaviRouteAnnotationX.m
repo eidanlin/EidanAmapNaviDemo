@@ -19,6 +19,17 @@
 
 @end
 
+@implementation AMapNaviCameraTypeAnnotationX
+
+- (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
+    if (self = [super init]) {
+        self.coordinate = coordinate;
+    }
+    return self;
+}
+
+@end
+
 @implementation AMapNaviStartPointAnnotationX
 
 - (id)initWithCoordinate:(CLLocationCoordinate2D)coordinate {
@@ -51,4 +62,5 @@
 }
 
 @end
+
 

@@ -25,6 +25,9 @@
 #define kAMapNaviLockStateZoomLevel             18.0f
 #define kAMapNaviLockStateCameraDegree          30.0f
 
+#define kAMapNaviShowCameraMaxZoomLevel         19.0f
+#define kAMapNaviShowCameraMinZoomLevel         15.0f
+
 #define kAMapNaviTurnArrowDistance              40.0f
 #define kAMapNaviShowTurnArrowMinZoomLevel      16.0f
 
@@ -97,12 +100,6 @@
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
 @property (nonatomic, weak) IBOutlet UIView *bottomContinueNaviBgView;
 
-//leftTipsView
-@property (nonatomic, weak) IBOutlet UIView *leftCameraInfoView;
-@property (nonatomic, weak) IBOutlet UIImageView *leftCameraInfoImageView;
-@property (nonatomic, weak) IBOutlet UIView *leftSpeedInfoView;
-@property (nonatomic, weak) IBOutlet UILabel *leftSpeedInfoLabel;
-
 //rightTipsView
 @property (nonatomic, weak) IBOutlet UIButton *rightBrowserBtn;
 @property (nonatomic, weak) IBOutlet UIButton *rightSwitchTrafficBtn;
@@ -160,9 +157,6 @@
     //bottomInfoView
     [self configureBottomInfoView];
     
-    //leftInfoView
-    [self configureLeftCameraAndSpeedView];
-    
     //rightInfoView
     [self configureRightTipsView];
     
@@ -194,7 +188,7 @@
 - (void)initProperties {
     
     //public
-    self.trackingMode = AMapNaviViewTrackingModeMapNorth;
+    self.trackingMode = AMapNaviViewTrackingModeCarNorth;
     //以下几个变量都有重写setter，这边应该写成 _lineWidth = kAMapNaviRoutePolylineDefaultWidth 这种不会调用setter的写法，但是这几个变量，不写也没关系，因为即使走了setter也都会被return回来
     self.lineWidth = kAMapNaviRoutePolylineDefaultWidth;
     self.cameraDegree = kAMapNaviLockStateCameraDegree;
@@ -313,6 +307,9 @@
         [self changeToNaviModeAtPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
     }
     [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:YES];
+    
+    //如果从缩小到很小的非锁车模式（这个时候是没有电子眼图标的）直接点击“继续导航”，变成锁车模式，需要电子眼图标，所以需要画出来，不加这句话，就没有
+    [self updateRouteCameraAnnotationWithStartIndex:0];
 }
 
 - (void)handleShowModeToOverview {
@@ -505,18 +502,17 @@
     
     self.currentNaviRoute = naviRoute;
     
-    
     //画出规划的路径，一般在这里画的路径都是不带路况信息，因为路况信息的回调还没调用。
     [self updateRoutePolyline];
     
     //起点，终点，沿途的点的绘制
     [self updateRoutePointAnnotation];
     
-    //更新电子眼信息
-    [self updateRouteCameraAnnotationWithStartIndex:0];
-    
     //锁车模式下，地图的中心点，缩放级别，摄像机角度
     [self changeToNaviModeAtPoint:self.currentNaviRoute.routeStartPoint];
+    
+    //更新电子眼信息,这里的显示与否取决于zoomLevel.
+    [self updateRouteCameraAnnotationWithStartIndex:0];
     
     //更新转向箭头，这里的显示与否有取决于zoomLevel,所以必须在changeToNaviModeAtPoint先把zoomLebel设定对了，再执行这个函数，第一个路口才会有箭头，而且changeToNaviModeAtPoint里面setZoomLevel不能有动画
     [self updateRouteTurnArrowPolylineWithSegmentIndex:0];
@@ -564,7 +560,6 @@
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateCameraInfos:(NSArray<AMapNaviCameraInfo *> *)cameraInfos {
     self.cameraInfos = cameraInfos;
     [self updateRouteCameraAnnotationWithCameraInfos:cameraInfos];
-    [self updateLeftCameraAndSpeedView];
 }
 
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
@@ -760,37 +755,6 @@
     }
 }
 
-#pragma -mark LeftCameraAndSpeedView
-
-- (void)configureLeftCameraAndSpeedView {
-    self.leftSpeedInfoView.hidden = self.leftCameraInfoView.hidden = YES;
-}
-
-
-- (void)updateLeftCameraAndSpeedView {
-    
-    AMapNaviCameraInfo *aCameraInfo = self.cameraInfos.firstObject;
-    
-    if (aCameraInfo.distance > 0) {
-        
-        if (aCameraInfo.cameraType == 0 && aCameraInfo.cameraSpeed > 0) {  //cameraType 0为测速摄像头，且有限速
-            self.leftSpeedInfoLabel.text = [NSString stringWithFormat:@"%ld",(long)aCameraInfo.cameraSpeed];
-            self.leftSpeedInfoView.hidden = NO;
-            self.leftCameraInfoView.hidden = YES;
-        } else if (aCameraInfo.cameraType >= 1) {  //监控摄像头
-            NSString *imageName = aCameraInfo.cameraType == 1 ? @"default_navi_camera" : @"default_navi_camera_content_normal";
-            self.leftCameraInfoImageView.image = [UIImage imageNamed:imageName];
-            self.leftSpeedInfoView.hidden = YES;
-            self.leftCameraInfoView.hidden = NO;
-        }
-        
-    } else {
-        //如果没有摄像头信息，即aCameraInfo为nil，不能return回去，要让其走这个分支，这样会把之前有的摄像头隐藏掉，否则会出现最后一个摄像头已经过去了，左上角还会有图标。
-        //电子眼距离<=0 为没有电子眼或距离很远
-        self.leftCameraInfoView.hidden = self.leftSpeedInfoView.hidden = YES;
-    }
-}
-
 #pragma -mark rightTipsView
 
 - (void)configureRightTipsView {
@@ -894,35 +858,28 @@
 
 #pragma mark - 更新电子眼信息
 
-///刚选择路径的时候，画出前2个
+///刚选择路径的时候，画出所有的电子眼，但只是图标
 - (void)updateRouteCameraAnnotationWithStartIndex:(NSInteger)startIndex {
+    
+    if (self.currentNaviRoute == nil) {  //没有路径，就无从显示
+        return;
+    }
     
     [self removeRouteCameraAnnotation];  //每次更新前，先全部移除所有电子眼
     
+    //zoomLevel不在范围内，这里取决于你全览或者放大缩小到一定程度，还是否想看到电子眼图标。
+    if (self.internalMapView.zoomLevel > kAMapNaviShowCameraMaxZoomLevel || self.internalMapView.zoomLevel < kAMapNaviShowCameraMinZoomLevel){
+        return;
+    }
+    
     int index = (int)startIndex;
     
-    while (index < self.currentNaviRoute.routeCameras.count && index < startIndex + 2) {  //只更新当前的电子眼信息，和当前的下一个，每次更新，只更新最近的这两个
+    while (index < self.currentNaviRoute.routeCameras.count ) {  //只更新当前的电子眼信息，和当前的下一个，每次更新，只更新最近的这两个
         AMapNaviCameraInfo *aCamera = [self.currentNaviRoute.routeCameras objectAtIndex:index];
         
-        AMapNaviCameraAnnotationX *anno = [AMapNaviCameraAnnotationX new];
+        AMapNaviCameraAnnotationX *anno = [[AMapNaviCameraAnnotationX alloc] init];
         [anno setCoordinate:CLLocationCoordinate2DMake(aCamera.coordinate.latitude, aCamera.coordinate.longitude)];
         [self.internalMapView addAnnotation:anno];
-        
-        index++;
-    }
-}
-
-- (void)updateRouteCameraAnnotationWithCameraInfos:(NSArray <AMapNaviCameraInfo *> *)cameraInfos
-{
-    [self removeRouteCameraAnnotation];  //如果数组为空，也是先移除，再return回去，因为数组为空，就是代表你刚路过完一个摄像头，要把其从地图上移除
-    
-    int index = 0;
-    while (index < cameraInfos.count && index < 2) { //只更新当前的电子眼信息，和当前的下一个，每次更新，只更新最近的这两个
-        AMapNaviCameraInfo *aCamera = [cameraInfos objectAtIndex:index];
-        
-        AMapNaviCameraAnnotationX *ann = [[AMapNaviCameraAnnotationX alloc] init];
-        [ann setCoordinate:CLLocationCoordinate2DMake(aCamera.coordinate.latitude, aCamera.coordinate.longitude)];
-        [self.internalMapView addAnnotation:ann];
         
         index++;
     }
@@ -931,6 +888,38 @@
 - (void)removeRouteCameraAnnotation {
     [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
         if ([obj isKindOfClass:[AMapNaviCameraAnnotationX class]]) {
+            [self.internalMapView removeAnnotation:obj];
+        }
+    }];
+}
+
+- (void)updateRouteCameraAnnotationWithCameraInfos:(NSArray <AMapNaviCameraInfo *> *)cameraInfos
+{
+    [self removeRouteCameraTypeAnnotation];  //如果数组为空，也是先移除，再return回去，因为数组为空，就是代表你刚路过完一个摄像头，要把其从地图上移除
+    
+    //zoomLevel不在范围内，这里取决于你全览或者放大缩小到一定程度，还是否想看到电子眼图标。
+    if (self.internalMapView.zoomLevel > kAMapNaviShowCameraMaxZoomLevel || self.internalMapView.zoomLevel < kAMapNaviShowCameraMinZoomLevel) {
+        return;
+    }
+    
+    int index = 0;
+    
+    while (index < cameraInfos.count && index < 2) { //只更新当前的电子眼信息，和当前的下一个，每次更新，只更新最近的这两个
+        AMapNaviCameraInfo *aCamera = [cameraInfos objectAtIndex:index];
+        
+        AMapNaviCameraTypeAnnotationX *anno = [[AMapNaviCameraTypeAnnotationX alloc] init];
+        anno.coordinate = CLLocationCoordinate2DMake(aCamera.coordinate.latitude, aCamera.coordinate.longitude);
+        anno.cameraInfo = aCamera;
+        anno.index = index;
+        [self.internalMapView addAnnotation:anno];
+        
+        index++;
+    }
+}
+
+- (void)removeRouteCameraTypeAnnotation {
+    [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviCameraTypeAnnotationX class]]) {
             [self.internalMapView removeAnnotation:obj];
         }
     }];
@@ -1167,7 +1156,7 @@
         [resultDrawStyleIndexArray addObject:@(resultCoordinateArray.count - 1)];
         
     } else {
-        while (resultDrawStyleIndexArray.count - 1 >= self.trafficStatus.count) {
+        while ((int)resultDrawStyleIndexArray.count - 1 >= (int)self.trafficStatus.count) {  //这里必须强转成int，进行条件判断，否则当resultDrawStyleIndexArray数组为0个，resultDrawStyleIndexArray.count - 1 就为无穷大,那么就死循环了，直接卡死.
             [resultDrawStyleIndexArray removeLastObject];
             [resultTextureImagesArray removeLastObject];
         }
@@ -1258,6 +1247,8 @@
     //用户利用手势改变地图的摄像机角度，缩放地图，地图的旋转角度，一定会进入非锁车模式，这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。地图的状态在非锁车模式下处理了，也没用，所以不处理
     if (self.lockCarPosition == NO) {
         [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO];
+        [self updateRouteCameraAnnotationWithStartIndex:0]; //实现全览或者地图缩放的比较小，摄像头不画，放大到一定程度，又有摄像头
+        [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos]; //同上
     }
     
 }
@@ -1345,6 +1336,23 @@
         
         return annView;
 
+    } else if ([annotation isKindOfClass:[AMapNaviCameraTypeAnnotationX class]]) {
+        
+        static NSString *cameraAnnIdentifier = @"AMapNaviCameraAnnotationTypeViewIdentifier";
+        
+        AMapNaviCameraTypeAnnotationX *cameraAnno = (AMapNaviCameraTypeAnnotationX *)annotation;
+        
+        AMapNaviCameraTypeAnnotationViewX *annView = (AMapNaviCameraTypeAnnotationViewX *)[mapView dequeueReusableAnnotationViewWithIdentifier:cameraAnnIdentifier];
+        if (annView == nil) {
+            annView = [[AMapNaviCameraTypeAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:cameraAnnIdentifier cameraInfo:cameraAnno.cameraInfo andIndex:cameraAnno.index];
+        }
+        
+        annView.enabled = NO;
+        annView.canShowCallout = NO;
+        annView.draggable = NO;
+        
+        return annView;
+        
     } else if ([annotation isKindOfClass:[AMapNaviStartPointAnnotationX class]]) {
         
         static NSString *startAnnIdentifier = @"AMapNaviStartPointAnnotationViewIdentifier";

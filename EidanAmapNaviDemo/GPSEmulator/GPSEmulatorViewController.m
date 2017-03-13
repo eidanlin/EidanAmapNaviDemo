@@ -111,7 +111,7 @@
     
     [self.driveManager stopNavi];
     
-//    [self.driveManager setEnableExternalLocation:NO];
+    [self.driveManager setEnableExternalLocation:NO];
 }
 
 

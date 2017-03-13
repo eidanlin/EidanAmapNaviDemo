@@ -7,8 +7,15 @@
 //
 
 #import <MAMapKit/MAAnnotationView.h>
+@class AMapNaviCameraInfo;
 
 @interface AMapNaviCameraAnnotationViewX : MAAnnotationView
+
+@end
+
+@interface AMapNaviCameraTypeAnnotationViewX : MAAnnotationView
+
+- (id)initWithAnnotation:(id<MAAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier cameraInfo:(AMapNaviCameraInfo *)info andIndex:(int)index;
 
 @end
 

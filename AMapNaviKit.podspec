@@ -18,7 +18,7 @@ Copyright © 2014 AutoNavi. All Rights Reserved.
   s.documentation_url = 'http://lbs.amap.com/api/ios-sdk/reference/'
 
 
-  s.source = { :http => "file:///Users/eidan/Desktop/AMap_iOS_Navi_Lib_V2.3.0_20170309.zip" }
+  s.source = { :http => "file:///Users/eidan/Desktop/AMap_iOS_Navi_Lib_V5.0.0_20170310.zip" }
 
   s.source_files  = 'AMapNaviKit.framework/**/*.{h}'
 

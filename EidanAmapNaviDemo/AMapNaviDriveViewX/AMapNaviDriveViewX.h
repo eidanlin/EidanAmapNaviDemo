@@ -27,7 +27,7 @@
 ///导航界面显示模式,默认AMapNaviDriveViewShowModeCarPositionLocked
 @property (nonatomic, assign) AMapNaviDriveViewShowMode showMode;  //不管什么模式，车一直都是在运动的，区分的只有地图的状态
 
-//跟随模式：地图朝北，车头朝北,默认AMapNaviViewTrackingModeMapNorth
+//跟随模式：车头朝北，地图朝北，默认AMapNaviViewTrackingModeCarNorth（车头朝北）
 @property (nonatomic, assign) AMapNaviViewTrackingMode trackingMode;  //其实更改跟随模式，只在lockCarPosition为YES，即锁车显示模式才有效果，此时地图的状态是跟着变的，而如果showMode为其他显示模式，地图不跟着动，就无所谓怎么跟随了
 
 

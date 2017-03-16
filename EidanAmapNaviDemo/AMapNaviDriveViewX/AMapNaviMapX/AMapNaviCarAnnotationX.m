@@ -17,6 +17,17 @@
     return self;
 }
 
+//遵循MAAnimatableAnnotation协议后要实现的，目前不需要
+//- (void)step:(CGFloat)timeDelta {
+//    if(self.stepCallback) {
+//        self.stepCallback(timeDelta);
+//    }
+//}
+//
+//- (BOOL)isAnimationFinished {
+//    return YES;
+//}
+
 @end
 
 

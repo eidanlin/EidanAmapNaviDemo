@@ -676,7 +676,13 @@
         }
         
         _carAnnotation = [AMapNaviCarAnnotationX new];
-        [_carAnnotation setCoordinate:CLLocationCoordinate2DMake(coordinate.latitude, coordinate.longitude)];
+        _carAnnotation.coordinate = CLLocationCoordinate2DMake(coordinate.latitude, coordinate.longitude);
+        
+        //如果AMapNaviCarAnnotationX遵循了MAAnimatableAnnotation协议，就可以使用地图的实时刷新函数，不用我们自己写timer了。
+//        __weak typeof(self) weakSelf = self;
+//        _carAnnotation.stepCallback = ^(CGFloat timeDelta) {
+//            [weakSelf moveCarLocationSmooth:nil];
+//        };
         
         [self.internalMapView addAnnotation:_carAnnotation];
         [self.internalMapView selectAnnotation:_carAnnotation animated:NO];

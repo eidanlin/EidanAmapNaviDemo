@@ -38,7 +38,7 @@
 
 //views
 #define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
-#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:37/255.0 green:45/255.0 blue:55/255.0 alpha:0.85]
+#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:39/255.0 green:44/255.0 blue:54/255.0 alpha:1]
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
 
@@ -80,18 +80,22 @@
 //mapView
 @property (nonatomic, weak) IBOutlet MAMapView *internalMapView;
 
-//路口放大图相关
-@property (nonatomic, weak) IBOutlet UIImageView *crossImageView;
-
 //车道信息图
 @property (nonatomic, weak) IBOutlet UIImageView *laneInfoView;
 
 //topInfoView
 @property (nonatomic, weak) IBOutlet UIView *topInfoView;
 @property (nonatomic, weak) IBOutlet UIImageView *topTurnImageView;
-@property (nonatomic, weak) IBOutlet UIImageView *topTurnSmallImageView;
 @property (nonatomic, weak) IBOutlet UILabel *topTurnRemainLabel;
 @property (nonatomic, weak) IBOutlet UILabel *topRoadLabel;
+
+//topInfoViewIn路口放大图模式
+@property (nonatomic, weak) IBOutlet UIView *topInfoContainerViewInCrossMode;
+@property (nonatomic, weak) IBOutlet UIImageView *crossImageView;
+@property (nonatomic, weak) IBOutlet UIImageView *topTurnImageViewInCrossMode;
+@property (nonatomic, weak) IBOutlet UILabel *topTurnRemainLabelInCrossMode;
+@property (nonatomic, weak) IBOutlet UILabel *topRoadLabelInCrossMode;
+
 
 //bottomInfoView
 @property (nonatomic, weak) IBOutlet UIView *bottomInfoView;
@@ -99,14 +103,25 @@
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
 @property (nonatomic, weak) IBOutlet UIView *bottomContinueNaviBgView;
+@property (nonatomic, weak) IBOutlet UIButton *bottomContinueNaviBtnInLandscape;
 
 //rightTipsView
 @property (nonatomic, weak) IBOutlet UIButton *rightBrowserBtn;
 @property (nonatomic, weak) IBOutlet UIButton *rightSwitchTrafficBtn;
 @property (nonatomic, weak) IBOutlet AMapNaviTrafficBarViewX *rightTrafficBarView;
 
-//Constraint
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeight;
+//constraint portrait
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightPortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopPortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightPortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthPortrait;
+
+//constraint landscape
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewWidthLandscape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewLeftLandscape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightLandscape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthLandScape;
+
 
 
 @end
@@ -138,15 +153,16 @@
     [[NSBundle mainBundle] loadNibNamed:@"AMapNaviDriveViewX" owner:self options:nil];
     [self addSubview:self.customView];
     self.customView.frame = self.bounds;
+    self.customView.backgroundColor = kAMapNaviInfoViewBackgroundColor;
+    
+    //监听设备方向。
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientaionChanged) name:UIDeviceOrientationDidChangeNotification object:NULL];
     
     //layoutConstraint
     [self configureTheConstraint];
     
     //property
     [self initProperties];
-    
-    //corssImageView
-    [self configureCrossImageView];
     
     //laneInfoView
     [self configureLaneInfoView];
@@ -171,16 +187,14 @@
 //layoutConstraint
 - (void)configureTheConstraint{
     
-    //竖屏下，根据机型，改变topInfoView的高度
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {  //pad
-        self.topInfoViewHeight.constant = 220;
-    } else {
-        float height = [UIScreen mainScreen].bounds.size.height;
-        if (height == 667) {  //iphone7
-            self.topInfoViewHeight.constant = 162.5;
-        } else if (height == 736) {
-            self.topInfoViewHeight.constant = 182;
-        }
+    //不同屏幕尺寸下改变路口放大图的大小，从而改变topInfoViewInCrossMode的大小
+    float height = [UIScreen mainScreen].bounds.size.height;
+    if (height == 375 || height == 667 ) {  //iphone7 竖屏和横屏
+        self.crossImageViewWidthPortrait.constant = self.crossImageViewHeightPortrait.constant = 240;
+        self.crossImageViewWidthLandScape.constant = self.crossImageViewHeightLandscape.constant = 265;
+    } else if (height == 414 || height == 736 ) {//iphone7Plus竖屏和横屏
+        self.crossImageViewWidthPortrait.constant = self.crossImageViewHeightPortrait.constant = 270;
+        self.crossImageViewWidthLandScape.constant = self.crossImageViewHeightLandscape.constant = 295;
     }
     
 }
@@ -213,6 +227,7 @@
 
 - (void)dealloc {
     NSLog(@"----------- driveViewX dealloc");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self stopMoveCarTimer];
     self.internalMapView.delegate = nil;
 }
@@ -590,7 +605,6 @@
     }
     
     [self updateRoutePolyline]; //如果路况信息更新了，就要重画
-    
 }
 
 //需要显示路口放大图了
@@ -599,8 +613,10 @@
     if (crossImage) {
         self.crossImageView.image = crossImage;
         self.crossImageView.hidden = NO;
+        self.showMode = AMapNaviDriveViewShowModeCarPositionLocked; //如果有路口放大图，恢复锁车模式
     }
     
+    [self handleWhenCrossImageShowAndHide];
 }
 
 //需要把路口放大图了隐藏了
@@ -608,6 +624,8 @@
     
     self.crossImageView.image = nil;
     self.crossImageView.hidden = YES;
+    
+    [self handleWhenCrossImageShowAndHide];
     
 }
 
@@ -628,6 +646,16 @@
     self.laneInfoView.hidden = YES;
 }
 
+#pragma -mark Orientaion
+
+-(void)orientaionChanged{
+    if([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft || [UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight){
+        
+    } else if ([UIDevice currentDevice].orientation == UIDeviceOrientationPortrait || [UIDevice currentDevice].orientation == UIDeviceOrientationPortraitUpsideDown){
+        
+    }
+}
+
 
 #pragma -mark Private: Component
 
@@ -636,14 +664,6 @@
     if (_carAnnotation == nil) {
         
         AMapNaviPoint *coordinate = nil;
-        
-
-//        //如果这样处理，因为manager里面，init的时候就开始定位，导致初始化就有位置，carAnnotation就会很快就被画在真正定位的位置，如果导航的起点设置在离目前定位点很远的地方，没办法实现像高德地图或者百度一样，车的图标在导航的起点。
-//        if (self.currentNaviMode == AMapNaviModeEmulator) {
-//            coordinate = self.currentNaviInfo.carCoordinate;
-//        } else {
-//            coordinate = self.currentCarLocation.coordinate;
-//        }
         
         //高德地图和百度地图，如果导航的起点设置在离目前定位点很远的地方，是直接跳到导航起点开始导航，但是只要一移动(自车位置一回调)，车图标就会定位到当前位置，并触发偏航重算。所以我们先把车的初始位置放在起点，然后GPS导航中，自车位置从自车位置回调中取，模拟导航中，自车位置从导航信息回调中取
         if (self.currentNaviRoute.routeStartPoint) {
@@ -673,6 +693,7 @@
 
 - (void)configureMapView {
     
+    self.internalMapView.mapType = MAMapTypeNavi;
     self.internalMapView.showsScale = NO;
     self.internalMapView.showsIndoorMap = NO;
     self.internalMapView.showsBuildings = NO;
@@ -688,11 +709,23 @@
     [self.internalMapView removeAnnotations:self.internalMapView.annotations];
 }
 
-#pragma -mark 路口放大图 
+#pragma -mark 路口放大图
 
-- (void)configureCrossImageView {
-    self.crossImageView.hidden = YES;
+
+- (void)handleWhenCrossImageShowAndHide {
+    
+    if (self.crossImageView.image) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
+        self.mapViewTopPortrait.constant = self.crossImageViewHeightPortrait.constant + 20;  //竖屏:放大图的高度＋状态栏的高度
+        self.mapViewLeftLandscape.constant = self.crossImageViewWidthLandScape.constant;  //横屏下
+        self.topInfoContainerViewInCrossMode.hidden = NO;
+    } else {
+        self.mapViewTopPortrait.constant = self.topInfoViewHeightPortrait.constant;
+        self.mapViewLeftLandscape.constant = self.topInfoViewWidthLandscape.constant;
+        self.topInfoContainerViewInCrossMode.hidden = YES;
+    }
+    
 }
+
 
 #pragma -mark 车道信息图 
 
@@ -705,6 +738,9 @@
 - (void)configureTopInfoView {
     self.topInfoView.superview.backgroundColor = kAMapNaviInfoViewBackgroundColor;
     self.topInfoView.hidden = YES;
+    
+    self.topInfoContainerViewInCrossMode.backgroundColor = kAMapNaviInfoViewBackgroundColor;
+    self.topInfoContainerViewInCrossMode.hidden = YES;
 }
 
 - (void)updateTopInfoView {
@@ -712,12 +748,16 @@
         
         self.topTurnRemainLabel.text = [NSString stringWithFormat:@"%@后",[AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.segmentRemainDistance]];
         self.topRoadLabel.text = self.currentNaviInfo.nextRoadName;
+        
+        self.topTurnRemainLabelInCrossMode.text = self.topTurnRemainLabel.text;
+        self.topRoadLabelInCrossMode.text = self.topRoadLabel.text;
+        
         UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,self.currentNaviInfo.iconType]];
         if (image == nil) {
             image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,AMapNaviIconTypeStraight]];
         }
         self.topTurnImageView.image = image;
-        self.topTurnSmallImageView.image = image;
+        self.topTurnImageViewInCrossMode.image = image;
         
         if (self.topInfoView.hidden == YES) {
             self.topInfoView.hidden = NO;
@@ -725,6 +765,7 @@
     } else {
         if (self.topInfoView.hidden == NO) {
             self.topInfoView.hidden = YES;
+            self.topInfoContainerViewInCrossMode.hidden = YES;
         }
     }
 }
@@ -732,9 +773,9 @@
 #pragma -mark bottomInfoView
 
 - (void)configureBottomInfoView {
-    self.bottomInfoView.backgroundColor = kAMapNaviInfoViewBackgroundColor;
     self.bottomRemainBgView.hidden = YES;
     self.bottomContinueNaviBgView.hidden = YES;
+    self.bottomContinueNaviBtnInLandscape.layer.cornerRadius = 3;
 }
 
 - (void)updateBottomInfoView {

@@ -142,8 +142,8 @@
 - (void)driveManagerOnCalculateRouteSuccess:(AMapNaviDriveManager *)driveManager
 {
     NSLog(@"onCalculateRouteSuccess");
-//    [self startGPSEmulator];
-    [self performSelector:@selector(startGPSEmulator) withObject:nil afterDelay:5];
+    [self startGPSEmulator];
+//    [self performSelector:@selector(startGPSEmulator) withObject:nil afterDelay:5];
 }
 
 - (void)driveManager:(AMapNaviDriveManager *)driveManager onCalculateRouteFailure:(NSError *)error

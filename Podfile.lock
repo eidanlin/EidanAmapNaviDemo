@@ -1,5 +1,5 @@
 PODS:
-  - AMap3DMapDebug (5.0.0-beta6)
+  - AMap3DMapDebug (5.0.0-beta7)
   - AMapFoundationDebug (1.4.0-beta2)
   - AMapNaviKit (5.0.0)
 
@@ -20,16 +20,16 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   AMap3DMapDebug:
-    :commit: caf31b9360ff64775587b548227e4486f34b879a
+    :commit: 6516ffaada64bdb8fab363734131b15c26d320fb
     :git: git@gitlab.alibaba-inc.com:AMap_iOS_Pod/AMap3DMapDebug.git
   AMapFoundationDebug:
     :commit: c5100c6f4779c3120b10a62d44d23ace6f89796e
     :git: git@gitlab.alibaba-inc.com:AMap_iOS_Pod/AMapFoundationDebug.git
 
 SPEC CHECKSUMS:
-  AMap3DMapDebug: 110559e5489144b524f7bf7267de38c55e57a91f
+  AMap3DMapDebug: ec5e17fe82a28f3a348c0fad86c7b7d59d78e35a
   AMapFoundationDebug: b827be06668f623fac5d1e12303577ae095dee9c
-  AMapNaviKit: 3433fdcee2845e149ddc2df008ce1dc5fc8452f0
+  AMapNaviKit: 069590d23ff449c689917f91b4cabf04cb271c6e
 
 PODFILE CHECKSUM: d066fe63dff94e00537e0758a4aff3691a422e23
 

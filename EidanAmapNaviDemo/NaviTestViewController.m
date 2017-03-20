@@ -33,6 +33,9 @@
     self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
     self.endPoint = [AMapNaviPoint locationWithLatitude:40.080603 longitude:116.602853];  //望京西园1区
     
+    self.startPoint = [AMapNaviPoint locationWithLatitude:39.993135 longitude:116.474175];
+    self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
+    
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
     [self.driveManager setEmulatorNaviSpeed:120];

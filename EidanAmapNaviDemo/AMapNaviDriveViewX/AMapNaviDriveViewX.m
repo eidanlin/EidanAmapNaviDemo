@@ -711,6 +711,11 @@
     self.internalMapView.centerCoordinate = CLLocationCoordinate2DMake(39.906207, 116.397582);
     self.internalMapView.showTraffic = self.showTrafficLayer;
     
+    [self.internalMapView setTrafficStatus:  @{@(MATrafficStatusSmooth)    : [UIColor colorWithRed:148/255.0 green:215/255.0 blue:115/255.0 alpha:1],
+                                              @(MATrafficStatusSlow)       : [UIColor colorWithRed:231/255.0 green:211/255.0 blue:82/255.0 alpha:1],
+                                              @(MATrafficStatusJam)        : [UIColor colorWithRed:231/255.0 green:138/255.0 blue:107/255.0 alpha:1],
+                                              @(MATrafficStatusSeriousJam) : [UIColor colorWithRed:189/255.0 green:93/255.0 blue:115/255.0 alpha:1]}];
+    
     [self.internalMapView removeOverlays:self.internalMapView.overlays];
     [self.internalMapView removeAnnotations:self.internalMapView.annotations];
 }

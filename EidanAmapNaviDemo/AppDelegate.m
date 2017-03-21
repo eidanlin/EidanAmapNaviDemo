@@ -19,9 +19,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    [AMapServices sharedServices].enableHTTPS = NO;
     [AMapServices sharedServices].apiKey = @"8987ddd43b3a44346a7e69330f8e654d";
-    
     
     return YES;
 }

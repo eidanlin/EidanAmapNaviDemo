@@ -18,8 +18,13 @@
 #import "AMapNaviRoutePolylineX.h"
 #import "AMapNaviTrafficBarViewX.h"
 
-#define kAMapNaviMoveCarSplitCount              14  //值越大，车的运动越平滑
-#define kAMapNaviMoveCarTimeInterval            (1.0/kAMapNaviMoveCarSplitCount)
+static const int AMapNaviMoveCarSplitCount = 14;  //值越大，车的运动越平滑
+static const CGFloat AMapNaviMoveCarTimeInterval = 1.0/AMapNaviMoveCarSplitCount;
+
+static const CGFloat AMapNaviRoutePolylineDefaultWidth = 15.f;  //显示规划的路径的默认宽度
+
+static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%ld";
+
 #define kAMapNaviInternalAnimationDuration      0.2f
 
 #define kAMapNaviLockStateZoomLevel             18.0f
@@ -34,10 +39,8 @@
 #define kAMapNaviMoveDirectlyMaxDistance        300.0f
 #define kAMapNaviMoveDirectlyMinDistance        1.0f
 
-#define kAMapNaviRoutePolylineDefaultWidth      15.0f  //显示规划的路径的默认宽度
-
 //views
-#define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
+//#define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
 #define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:39/255.0 green:44/255.0 blue:54/255.0 alpha:1]
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
@@ -204,14 +207,14 @@
     //public
     self.trackingMode = AMapNaviViewTrackingModeCarNorth;
     //以下几个变量都有重写setter，这边应该写成 _lineWidth = kAMapNaviRoutePolylineDefaultWidth 这种不会调用setter的写法，但是这几个变量，不写也没关系，因为即使走了setter也都会被return回来
-    self.lineWidth = kAMapNaviRoutePolylineDefaultWidth;
+    self.lineWidth = AMapNaviRoutePolylineDefaultWidth;
     self.cameraDegree = kAMapNaviLockStateCameraDegree;
     self.showTrafficLayer = YES;
     self.showMode = AMapNaviRideViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
     
     
     //car and map move
-    self.splitCount = kAMapNaviMoveCarSplitCount;
+    self.splitCount = AMapNaviMoveCarSplitCount;
     self.needMoving = NO;
     
     //private
@@ -396,7 +399,7 @@
     AMapNaviTimerTargetX *target = [AMapNaviTimerTargetX new];
     target.realTarget = self;
     
-    self.moveCarTimer = [NSTimer scheduledTimerWithTimeInterval:kAMapNaviMoveCarTimeInterval target:target selector:@selector(moveCarLocationSmooth:) userInfo:nil repeats:YES];
+    self.moveCarTimer = [NSTimer scheduledTimerWithTimeInterval:AMapNaviMoveCarTimeInterval target:target selector:@selector(moveCarLocationSmooth:) userInfo:nil repeats:YES];
 }
 
 - (void)stopMoveCarTimer {
@@ -763,9 +766,9 @@
         self.topTurnRemainLabelInCrossMode.text = self.topTurnRemainLabel.text;
         self.topRoadLabelInCrossMode.text = self.topRoadLabel.text;
         
-        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,self.currentNaviInfo.iconType]];
+        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,self.currentNaviInfo.iconType]];
         if (image == nil) {
-            image = [UIImage imageNamed:[NSString stringWithFormat:KAMapNaviInfoViewTurnIconImage,AMapNaviIconTypeStraight]];
+            image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,AMapNaviIconTypeStraight]];
         }
         self.topTurnImageView.image = image;
         self.topTurnImageViewInCrossMode.image = image;

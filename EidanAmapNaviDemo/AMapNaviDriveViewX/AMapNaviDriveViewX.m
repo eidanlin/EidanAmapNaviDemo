@@ -530,7 +530,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     [self updateRoutePolyline];
     
     //牵引线
-    [self updateCarToDestinationGuidLineWhenRouteReady];
+    [self updateCarToDestinationGuidLine];
     
     //起点，终点，沿途的点的绘制
     [self updateRoutePointAnnotation];
@@ -698,6 +698,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         
         [self.internalMapView addAnnotation:_carAnnotation];
         [self.internalMapView selectAnnotation:_carAnnotation animated:NO];
+        
+        //牵引线
+        [self updateCarToDestinationGuidLine];
         
     }
     return _carAnnotation;
@@ -989,34 +992,37 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }];
 }
 
-#pragma mark －牵引线
+#pragma mark - 牵引线
 
-//画出牵引当路线准备好时
-- (void)updateCarToDestinationGuidLineWhenRouteReady {
+//画出牵引线：前提条件：1.有车图标，才有自车位置；2.有路线，才有合适的终点。所以需要2个地方调用，因为我们没办法确认2个条件成立的时机
+- (void)updateCarToDestinationGuidLine {
     
-    //remove
+    if (self.currentNaviRoute == nil || self.carAnnotation == nil) {
+        [self removeCarToDestinationGuidLine];
+    } else {
+        CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(2 * sizeof(CLLocationCoordinate2D));
+        
+        coordinates[0] = self.carAnnotation.coordinate;
+        coordinates[1] = CLLocationCoordinate2DMake(self.currentNaviRoute.routeEndPoint.latitude, self.currentNaviRoute.routeEndPoint.longitude);
+        
+        self.carToDestinationGuidePolyline = [AMapNaviGuidePolyline polylineWithCoordinates:coordinates count:2];
+        
+        free(coordinates);
+        coordinates = NULL;
+        
+        [self removeCarToDestinationGuidLine];  //分开写remove，保证再加入新的，才把就的移除掉，防止出现2条
+        
+        [self.internalMapView addOverlay:self.carToDestinationGuidePolyline level:MAOverlayLevelAboveLabels];
+    }
+}
+
+//remove
+- (void)removeCarToDestinationGuidLine{
     [self.internalMapView.overlays enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         if ([obj isKindOfClass:[AMapNaviGuidePolyline class]]) {
             [self.internalMapView removeOverlay:obj];
         }
     }];
-    
-    
-    if (self.currentNaviRoute == nil || self.carAnnotation == nil) {
-        return;
-    }
-    
-    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(2 * sizeof(CLLocationCoordinate2D));
-    
-    coordinates[0] = self.carAnnotation.coordinate;
-    coordinates[1] = CLLocationCoordinate2DMake(self.currentNaviRoute.routeEndPoint.latitude, self.currentNaviRoute.routeEndPoint.longitude);
-    
-    self.carToDestinationGuidePolyline = [AMapNaviGuidePolyline polylineWithCoordinates:coordinates count:2];
-    
-    free(coordinates);
-    coordinates = NULL;
-    
-    [self.internalMapView addOverlay:self.carToDestinationGuidePolyline level:MAOverlayLevelAboveLabels];
 }
 
 //移动牵引线的起点当车移动后

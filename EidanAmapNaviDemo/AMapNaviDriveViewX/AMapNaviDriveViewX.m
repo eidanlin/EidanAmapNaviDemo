@@ -71,11 +71,14 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //Data Representable
 @property (nonatomic, assign) AMapNaviMode currentNaviMode;
-@property (nonatomic, copy) AMapNaviLocation *currentCarLocation;
-@property (nonatomic, copy) AMapNaviInfo *currentNaviInfo;      //当前正在导航的这一个时间点的导航具体信息，会快速的变化
+@property (nonatomic, strong) AMapNaviLocation *currentCarLocation;
+@property (nonatomic, strong) AMapNaviInfo *currentNaviInfo;      //当前正在导航的这一个时间点的导航具体信息，会快速的变化
 @property (nonatomic, copy) NSArray<AMapNaviCameraInfo *> *cameraInfos;
-@property (nonatomic, copy) AMapNaviRoute *currentNaviRoute;  //当前需要导航的的一整条路径的信息，开始导航后，就不再改变
+@property (nonatomic, strong) AMapNaviRoute *currentNaviRoute;  //当前需要导航的的一整条路径的信息，开始导航后，就不再改变
 @property (nonatomic, copy) NSArray <AMapNaviTrafficStatus *> *trafficStatus;  //前方交通路况信息(长度和拥堵情况)
+
+//牵引线
+@property (nonatomic, strong) AMapNaviGuidePolyline *carToDestinationGuidePolyline;
 
 #pragma -mark xib views
 @property (nonatomic, strong) IBOutlet UIView *customView;
@@ -370,7 +373,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //设置车的倾斜角度和旋转角度还有位置。也可以设置地图的中心点和旋转角度，但不设置地图的倾斜角度（即摄像机角度）
 - (void)resetCarAnnotaionToRightStateAndIsNeedResetMapView:(BOOL)isNeed {
     
-    [self.carAnnotation setCoordinate:self.carAnnotation.coordinate];
     [self.carAnnotationView setCarDirection:self.carAnnotationView.carDirection];
     [self.carAnnotationView setCompassDirection:0];
     
@@ -441,6 +443,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         self.needMoving = NO;
         self.moveDirectly = NO;
         
+        [self updateCarToDestinationGuidePolylineWhenCarMove];
+        
         return;
     }
 
@@ -465,6 +469,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         [self.carAnnotation setCoordinate:CLLocationCoordinate2DMake(stepLat, stepLon)];
         [self.carAnnotationView setCarDirection:stepDirection];  //无论哪种跟随模式，车在地图上的方向都要改变，来适应一直车头对着道路前进的方向
         [self.carAnnotationView setCompassDirection:0];  //无论哪种跟随模式，车的罗盘的方向的北一直和地图上指南针的北指向同一个方向，因为setCarDirection已经做了改变，让carAnnotationView整体改变，所以这边一直保持为0
+        
+        [self updateCarToDestinationGuidePolylineWhenCarMove];
         
     } else {
         self.stepCount = 0;
@@ -522,6 +528,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //画出规划的路径，一般在这里画的路径都是不带路况信息，因为路况信息的回调还没调用。
     [self updateRoutePolyline];
+    
+    //牵引线
+    [self updateCarToDestinationGuidLineWhenRouteReady];
     
     //起点，终点，沿途的点的绘制
     [self updateRoutePointAnnotation];
@@ -980,6 +989,52 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }];
 }
 
+#pragma mark －牵引线
+
+//画出牵引当路线准备好时
+- (void)updateCarToDestinationGuidLineWhenRouteReady {
+    
+    //remove
+    [self.internalMapView.overlays enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviGuidePolyline class]]) {
+            [self.internalMapView removeOverlay:obj];
+        }
+    }];
+    
+    
+    if (self.currentNaviRoute == nil || self.carAnnotation == nil) {
+        return;
+    }
+    
+    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(2 * sizeof(CLLocationCoordinate2D));
+    
+    coordinates[0] = self.carAnnotation.coordinate;
+    coordinates[1] = CLLocationCoordinate2DMake(self.currentNaviRoute.routeEndPoint.latitude, self.currentNaviRoute.routeEndPoint.longitude);
+    
+    self.carToDestinationGuidePolyline = [AMapNaviGuidePolyline polylineWithCoordinates:coordinates count:2];
+    
+    free(coordinates);
+    coordinates = NULL;
+    
+    [self.internalMapView addOverlay:self.carToDestinationGuidePolyline level:MAOverlayLevelAboveLabels];
+}
+
+//移动牵引线的起点当车移动后
+- (void)updateCarToDestinationGuidePolylineWhenCarMove {
+    if (self.carToDestinationGuidePolyline) {
+        
+        CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(2 * sizeof(CLLocationCoordinate2D));
+        
+        coordinates[0] = self.carAnnotation.coordinate;
+        coordinates[1] = CLLocationCoordinate2DMake(self.currentNaviRoute.routeEndPoint.latitude, self.currentNaviRoute.routeEndPoint.longitude);
+        
+        [self.carToDestinationGuidePolyline setPolylineWithCoordinates:coordinates count:2];
+        
+        free(coordinates);
+        coordinates = NULL;
+    }
+}
+
 #pragma mark - 更新转弯的箭头信息，每一个分段AMapNaviSegment，就是由一个个拐弯分割的
 
 - (void)updateRouteTurnArrowPolylineWithSegmentIndex:(NSInteger)segmentIndex {
@@ -1299,9 +1354,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //地图区域改变完成后会调用此接口
 - (void)mapView:(MAMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
     
-    //用户利用手势改变地图的摄像机角度，缩放地图，地图的旋转角度，一定会进入非锁车模式，这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。地图的状态在非锁车模式下处理了，也没用，所以不处理
+    //用户利用手势改变地图的摄像机角度，缩放地图，地图的旋转角度，一定会进入非锁车模式
     if (self.lockCarPosition == NO) {
-        [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO];
+//        [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO]; 这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。貌似地图5.0.0后，不用处理平行的问题。
         [self updateRouteCameraAnnotationWithStartIndex:0]; //实现全览或者地图缩放的比较小，摄像头不画，放大到一定程度，又有摄像头
         [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos]; //同上
     }
@@ -1318,6 +1373,15 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         polylineRenderer.strokeColor = [UIColor colorWithRed:49.0/255.0 green:168.0/255.0 blue:249.0/255.0 alpha:1.0];
         polylineRenderer.lineWidth = 12.0f;
         polylineRenderer.lineCapType = kMALineCapArrow;
+        
+        return polylineRenderer;
+    } else if ([overlay isKindOfClass:[AMapNaviGuidePolyline class]]) {  //牵引线
+        
+        MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:overlay];
+        
+        polylineRenderer.strokeColor = [UIColor colorWithRed:213.0/255.0 green:35/255.0 blue:33/255.0 alpha:1.0];
+        polylineRenderer.lineWidth = 2.0f;
+        polylineRenderer.lineCapType = kMALineCapButt;
         
         return polylineRenderer;
     } else if ([overlay isKindOfClass:[AMapNaviRoutePolylineX class]]) {  //规划的路径

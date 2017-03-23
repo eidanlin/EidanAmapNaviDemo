@@ -8,6 +8,7 @@
 
 #import "AMapNaviRoutePolylineX.h"
 
+
 @implementation AMapNaviRouteTurnArrowPolylineX
 
 @end
@@ -15,5 +16,11 @@
 
 
 @implementation AMapNaviRoutePolylineX
+
+@end
+
+
+
+@implementation AMapNaviGuidePolyline
 
 @end

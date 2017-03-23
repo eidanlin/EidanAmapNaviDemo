@@ -33,3 +33,9 @@
 
 @end
 
+
+#pragma mark - AMapNaviGuidePolyline
+
+@interface AMapNaviGuidePolyline : MAPolyline
+
+@end

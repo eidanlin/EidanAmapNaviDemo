@@ -21,6 +21,6 @@
 
 
 
-@implementation AMapNaviGuidePolyline
+@implementation AMapNaviGuidePolylineX
 
 @end

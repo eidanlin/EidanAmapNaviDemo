@@ -31,9 +31,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 #define kAMapNaviLockStateCameraDegree          30.0f
 
 #define kAMapNaviShowCameraMaxZoomLevel         19.0f
-#define kAMapNaviShowCameraMinZoomLevel         15.0f
+#define kAMapNaviShowCameraMinZoomLevel         16.0f
 
-#define kAMapNaviTurnArrowDistance              40.0f
+#define kAMapNaviTurnArrowDistance              20.0f
 #define kAMapNaviShowTurnArrowMinZoomLevel      16.0f
 
 #define kAMapNaviMoveDirectlyMaxDistance        300.0f
@@ -78,7 +78,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, copy) NSArray <AMapNaviTrafficStatus *> *trafficStatus;  //前方交通路况信息(长度和拥堵情况)
 
 //牵引线
-@property (nonatomic, strong) AMapNaviGuidePolyline *carToDestinationGuidePolyline;
+@property (nonatomic, strong) AMapNaviGuidePolylineX *carToDestinationGuidePolyline;
 
 #pragma -mark xib views
 @property (nonatomic, strong) IBOutlet UIView *customView;
@@ -1005,7 +1005,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         coordinates[0] = self.carAnnotation.coordinate;
         coordinates[1] = CLLocationCoordinate2DMake(self.currentNaviRoute.routeEndPoint.latitude, self.currentNaviRoute.routeEndPoint.longitude);
         
-        self.carToDestinationGuidePolyline = [AMapNaviGuidePolyline polylineWithCoordinates:coordinates count:2];
+        self.carToDestinationGuidePolyline = [AMapNaviGuidePolylineX polylineWithCoordinates:coordinates count:2];
         
         free(coordinates);
         coordinates = NULL;
@@ -1019,7 +1019,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //remove
 - (void)removeCarToDestinationGuidLine{
     [self.internalMapView.overlays enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([obj isKindOfClass:[AMapNaviGuidePolyline class]]) {
+        if ([obj isKindOfClass:[AMapNaviGuidePolylineX class]]) {
             [self.internalMapView removeOverlay:obj];
         }
     }];
@@ -1381,7 +1381,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         polylineRenderer.lineCapType = kMALineCapArrow;
         
         return polylineRenderer;
-    } else if ([overlay isKindOfClass:[AMapNaviGuidePolyline class]]) {  //牵引线
+    } else if ([overlay isKindOfClass:[AMapNaviGuidePolylineX class]]) {  //牵引线
         
         MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:overlay];
         

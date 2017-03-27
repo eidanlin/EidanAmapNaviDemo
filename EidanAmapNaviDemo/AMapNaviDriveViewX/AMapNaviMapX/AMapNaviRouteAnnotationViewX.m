@@ -72,7 +72,7 @@
         if (info.cameraType == AMapNaviCameraTypeSpeed) {  //测速
             UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(xPoint, -13, self.bounds.size.width, 30)];
             label.text = [NSString stringWithFormat:@"%ld",(long)info.cameraSpeed];
-            label.font = [UIFont boldSystemFontOfSize:16];
+            label.font = [UIFont boldSystemFontOfSize:18];
             label.textAlignment = NSTextAlignmentCenter;
             [self addSubview:label];
         }

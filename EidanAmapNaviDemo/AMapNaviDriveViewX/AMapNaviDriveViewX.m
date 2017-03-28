@@ -119,8 +119,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //constraint portrait
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightPortrait;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopPortrait;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightPortrait;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthPortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightInCrossModePortrait;
 
 //constraint landscape
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewWidthLandscape;
@@ -128,6 +127,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthLandScape;
 
+//constraint normal
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightTrafficBarViewHeight;
 
 
 @end
@@ -193,14 +194,26 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //layoutConstraint
 - (void)configureTheConstraint{
     
-    //不同屏幕尺寸下改变路口放大图的大小，从而改变topInfoViewInCrossMode的大小
-    float height = [UIScreen mainScreen].bounds.size.height;
-    if (height == 375 || height == 667 ) {  //iphone7 竖屏和横屏
-        self.crossImageViewWidthPortrait.constant = self.crossImageViewHeightPortrait.constant = 240;
-        self.crossImageViewWidthLandScape.constant = self.crossImageViewHeightLandscape.constant = 265;
-    } else if (height == 414 || height == 736 ) {//iphone7Plus竖屏和横屏
-        self.crossImageViewWidthPortrait.constant = self.crossImageViewHeightPortrait.constant = 270;
-        self.crossImageViewWidthLandScape.constant = self.crossImageViewHeightLandscape.constant = 295;
+    float shorterSide = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);  //较短的一边
+    float longerSide = MAX([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);   //较长的一边
+    
+    //SDK给出的路口放大图的尺寸
+    float crossImageOriginWidth = 500.0;
+    float crossImageOriginHeight = 320.0;
+    
+    //以下不管横竖屏，都是希望算出图片按比例缩放后应有的高度，来保证不变形
+    //横屏下的计算，使用较长的一边作为顶边
+    self.crossImageViewWidthLandScape.constant = longerSide / 2;
+    self.crossImageViewHeightLandscape.constant = self.crossImageViewWidthLandScape.constant * crossImageOriginHeight / crossImageOriginWidth + 30;  //30为微调，加了30可以不显得那么空，但会变形，但可以接受。
+    
+    //竖屏的计算，使用较短的一边作为顶边
+    self.topInfoViewHeightInCrossModePortrait.constant = shorterSide * crossImageOriginHeight / crossImageOriginWidth + 20 + 50;  //20为状态栏高度，50为信息横条所占的高度
+    
+    //光柱图的高度
+    if (shorterSide == 375) {  //6
+        self.rightTrafficBarViewHeight.constant = 260;
+    } else if (shorterSide == 414) {  //6p
+        self.rightTrafficBarViewHeight.constant = 295;
     }
     
 }
@@ -312,7 +325,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.bottomContinueNaviBgView.hidden = NO;
     self.rightSwitchTrafficBtn.hidden = NO;
     self.rightBrowserBtn.hidden = self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
-    self.rightTrafficBarView.hidden = YES;
+    
+    [self handleRightTrafficBarViewShowOrHide];
 }
 
 - (void)handleShowModeToLockedCarPosition {
@@ -321,7 +335,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.bottomContinueNaviBgView.hidden = YES;
     self.rightSwitchTrafficBtn.hidden = YES;
     self.rightBrowserBtn.hidden = YES;
-    self.rightTrafficBarView.hidden = NO;
+    
+    [self handleRightTrafficBarViewShowOrHide];
+    
     
     //恢复锁车模式，设置地图和车为正确状态，特别是车的倾斜角度,先把地图的倾斜角度设置对了，根据地图的倾斜角度设置车，顺序不能乱，设置车的倾斜角度中，也要设置地图的旋转角度
     if (self.carAnnotation) {
@@ -741,14 +757,17 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)handleWhenCrossImageShowAndHide {
     
     if (self.crossImageView.image) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
-        self.mapViewTopPortrait.constant = self.crossImageViewHeightPortrait.constant + 20;  //竖屏:放大图的高度＋状态栏的高度
+        self.mapViewTopPortrait.constant = self.topInfoViewHeightInCrossModePortrait.constant;  //竖屏下
         self.mapViewLeftLandscape.constant = self.crossImageViewWidthLandScape.constant;  //横屏下
         self.topInfoContainerViewInCrossMode.hidden = NO;
+        
     } else {
-        self.mapViewTopPortrait.constant = self.topInfoViewHeightPortrait.constant;
-        self.mapViewLeftLandscape.constant = self.topInfoViewWidthLandscape.constant;
+        self.mapViewTopPortrait.constant = self.topInfoViewHeightPortrait.constant;  //竖屏下
+        self.mapViewLeftLandscape.constant = self.topInfoViewWidthLandscape.constant;  //横屏下
         self.topInfoContainerViewInCrossMode.hidden = YES;
     }
+    
+    [self handleRightTrafficBarViewShowOrHide];
     
 }
 
@@ -778,9 +797,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         self.topTurnRemainLabelInCrossMode.text = self.topTurnRemainLabel.text;
         self.topRoadLabelInCrossMode.text = self.topRoadLabel.text;
         
-        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,self.currentNaviInfo.iconType]];
+        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,(long)self.currentNaviInfo.iconType]];
         if (image == nil) {
-            image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,AMapNaviIconTypeStraight]];
+            image = [UIImage imageNamed:[NSString stringWithFormat:AMapNaviInfoViewTurnIconImage,(long)AMapNaviIconTypeStraight]];
         }
         self.topTurnImageView.image = image;
         self.topTurnImageViewInCrossMode.image = image;
@@ -827,6 +846,17 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)configureRightTipsView {
     self.rightBrowserBtn.hidden = YES;
     self.rightSwitchTrafficBtn.hidden = YES;
+}
+
+
+- (void)handleRightTrafficBarViewShowOrHide {
+    
+    //只有在锁车模式，且没有路口放大图，才会有光柱图
+    if (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked && self.crossImageView.image == nil) {
+        self.rightTrafficBarView.hidden = NO;
+    } else {
+        self.rightTrafficBarView.hidden = YES;
+    }
 }
 
 #pragma -mark xib btns click

@@ -36,12 +36,12 @@
     self.startPoint = [AMapNaviPoint locationWithLatitude:39.993135 longitude:116.474175];
     self.endPoint   = [AMapNaviPoint locationWithLatitude:39.908791 longitude:116.321257];
     
-//    self.startPoint = [AMapNaviPoint locationWithLatitude:39.958338 longitude:116.457036];
-//    self.endPoint   = [AMapNaviPoint locationWithLatitude:40.079308 longitude:116.604179];
+    self.startPoint = [AMapNaviPoint locationWithLatitude:39.958338 longitude:116.457036];
+    self.endPoint   = [AMapNaviPoint locationWithLatitude:40.079308 longitude:116.604179];
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
-    [self.driveManager setEmulatorNaviSpeed:120];
+//    [self.driveManager setEmulatorNaviSpeed:120];
     
     self.driveView.delegate = self;
     
@@ -147,6 +147,16 @@
     NSLog(@"onArrivedDestination");
 }
 
+#pragma mark - StatusBar
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+
+- (BOOL)prefersStatusBarHidden {
+    return NO;
+}
 
 
 @end

@@ -14,6 +14,8 @@
 
 @property (nonatomic, strong) UIImageView *carImageView;
 
+@property (nonatomic, strong) CAShapeLayer *outterBorderLayer;
+
 @property (nonatomic, strong) CALayer *lightBlueLayer;
 
 @property (nonatomic, strong) CALayer *greyLayer;
@@ -21,6 +23,12 @@
 @property (nonatomic, strong) CALayer *trafficStatusesContainerLayer;
 
 @property (nonatomic, strong) NSArray <CAShapeLayer *> *trafficStatusLayerArray;
+
+@property (nonatomic, weak) NSArray <AMapNaviTrafficStatus *> *trafficStatus;
+
+@property (nonatomic, assign) float currentHeight;
+
+@property (nonatomic, assign) float lastRemainPercent;
 
 @end
 
@@ -49,6 +57,10 @@
     self.backgroundColor = [UIColor clearColor];
     self.userInteractionEnabled = NO;
     
+    //default
+    self.currentHeight = self.bounds.size.height;
+    self.lastRemainPercent = 1;
+    
     //初始化时候那个蓝色层，随后一闪而过
     self.lightBlueLayer = [CALayer layer];
     self.lightBlueLayer.frame = self.bounds;
@@ -66,15 +78,7 @@
     self.trafficStatusesContainerLayer.masksToBounds = YES;
     [self.layer addSublayer:self.trafficStatusesContainerLayer];
     
-    //边界要外扩，边界线的内边贴着self这个view的实际区域，外边直接超出了view，这样整个view的高度才是一个有效的总高度，以这个高度来计算百分比，比较方便，不用额外的减边界的宽度
-    float outterBorderWidth = 3;
-    float outterBorderOffset = outterBorderWidth / 2;
-    UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:8];
-    
-    CAShapeLayer *outterBorderLayer = [self createShapeLayr:outterBorderWidth andStrokeColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:1]];
-    outterBorderLayer.path = outterPath.CGPath;
-    outterBorderLayer.zPosition = 1;
-    [self.layer addSublayer:outterBorderLayer];
+    [self drawOutterBorder];
     
     //位置减去1，是因为车的图没切好，离了1个像素的空白，如果顶着边切，就不用减去1
     self.carImageView = [[UIImageView alloc] initWithFrame:CGRectMake((self.bounds.size.width - 28) / 2, self.bounds.size.height - 1 , 28, 28)];
@@ -106,15 +110,43 @@
     
 }
 
+//外边框层
+- (void)drawOutterBorder {
+    
+    [self.outterBorderLayer removeFromSuperlayer];
+    
+    //边界要外扩，边界线的内边贴着self这个view的实际区域，外边直接超出了view，这样整个view的高度才是一个有效的总高度，以这个高度来计算百分比，比较方便，不用额外的减边界的宽度
+    float outterBorderWidth = 3;
+    float outterBorderOffset = outterBorderWidth / 2;
+    UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:8];
+    
+    self.outterBorderLayer = [self createShapeLayr:outterBorderWidth andStrokeColor:[UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:1]];
+    self.outterBorderLayer.path = outterPath.CGPath;
+    self.outterBorderLayer.zPosition = 1;
+    [self.layer addSublayer:self.outterBorderLayer];
+}
+
+- (void)layoutSubviews {
+    
+    if (self.currentHeight != self.bounds.size.height) {  //做一层判断，防止总是执行，提高效率，只在总的高度变了才执行，用于屏幕适配
+        self.currentHeight = self.bounds.size.height;
+        self.lightBlueLayer.frame = self.bounds;
+        [self drawOutterBorder];  //重画
+        [self updateBarWithTrafficStatuses:self.trafficStatus];  //立刻更新色块的位置
+        [self updateCarPositionWithRouteRemainPercent:self.lastRemainPercent];  //立刻更新车的位置
+    }
+    
+}
+
 #pragma -mark interface
 
 //更新车的位置，然后灰色跟着车，然后路况层的底部是灰色层的顶部
 - (void)updateCarPositionWithRouteRemainPercent:(double)remainPercent {
     
-    double lastRemainPercent = MAX(0, MIN(1, remainPercent));
+    self.lastRemainPercent = MAX(0, MIN(1, remainPercent));
     
     //位置再减去1，是因为车的图没切好，离了1个像素的空白，如果顶着边切，就不用减去1
-    self.carImageView.frame = CGRectMake(self.carImageView.frame.origin.x, self.bounds.size.height * lastRemainPercent - 1, self.carImageView.frame.size.width, self.carImageView.frame.size.height);
+    self.carImageView.frame = CGRectMake(self.carImageView.frame.origin.x, self.bounds.size.height * self.lastRemainPercent - 1, self.carImageView.frame.size.width, self.carImageView.frame.size.height);
     
     //+1也是图片没有切好的后遗症，为了不让灰色跑在车前面，灰色要往下微调
     self.greyLayer.frame = CGRectMake(0, self.carImageView.frame.origin.y + 1, self.bounds.size.width, self.bounds.size.height - self.carImageView.frame.origin.y - 1);
@@ -130,6 +162,12 @@
 }
 
 - (void)updateBarWithTrafficStatuses:(NSArray <AMapNaviTrafficStatus *> *)trafficStatuses {
+    
+    if (trafficStatuses.count == 0) {
+        return;
+    }
+    
+    self.trafficStatus = trafficStatuses;
     
     if (self.lightBlueLayer.superlayer) {
         [self.lightBlueLayer removeFromSuperlayer];
@@ -150,7 +188,6 @@
         totalLength += aTraffic.length;
     }];
     
-    
     //需要倒序，因为最后一个路况在最上面
     __block NSInteger hasLength = 0;
     [trafficStatuses enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(AMapNaviTrafficStatus * _Nonnull aTraffic, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -170,7 +207,7 @@
     for (int i = 0; i < self.trafficStatusLayerArray.count; i ++) {
         self.trafficStatusLayerArray[i].path = pathArray[i].CGPath;
     }
-    
+
 }
 
 #pragma -mark private

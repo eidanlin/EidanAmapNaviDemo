@@ -193,7 +193,16 @@
     [self stopGPSEmulator];
 }
 
+#pragma mark - StatusBar
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+
+- (BOOL)prefersStatusBarHidden {
+    return NO;
+}
 
 
 @end

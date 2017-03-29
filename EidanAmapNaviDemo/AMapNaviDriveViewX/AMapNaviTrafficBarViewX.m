@@ -128,7 +128,7 @@
 
 - (void)layoutSubviews {
     
-    if (self.currentHeight != self.bounds.size.height) {  //做一层判断，防止总是执行，提高效率，只在总的高度变了才执行，用于屏幕适配
+    if (self.currentHeight != self.bounds.size.height) {  //做一层判断，防止总是执行，提高效率，只在总的高度变了才执行，用于屏幕旋转适配
         self.currentHeight = self.bounds.size.height;
         self.lightBlueLayer.frame = self.bounds;
         [self drawOutterBorder];  //重画

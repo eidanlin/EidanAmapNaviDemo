@@ -127,9 +127,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthLandScape;
 
-//constraint normal
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightTrafficBarViewHeight;
-
 
 @end
 
@@ -208,13 +205,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //竖屏的计算，使用较短的一边作为顶边
     self.topInfoViewHeightInCrossModePortrait.constant = shorterSide * crossImageOriginHeight / crossImageOriginWidth + 20 + 50;  //20为状态栏高度，50为信息横条所占的高度
-    
-    //光柱图的高度
-    if (shorterSide == 375) {  //6
-        self.rightTrafficBarViewHeight.constant = 260;
-    } else if (shorterSide == 414) {  //6p
-        self.rightTrafficBarViewHeight.constant = 295;
-    }
     
 }
 
@@ -379,7 +369,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     MACoordinateRegion region = MACoordinateRegionMake(centerCoordinate, MACoordinateSpanMake(latitudeDelta, longitudeDelta));
     MAMapRect mapRect = MAMapRectForCoordinateRegion(region);
     
-    UIEdgeInsets insets = UIEdgeInsetsMake(20, 20, 20, 20);
+    UIEdgeInsets insets = UIEdgeInsetsMake(30, 30, 30, 30);
     
     [self.internalMapView setRotationDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
     [self.internalMapView setCameraDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];

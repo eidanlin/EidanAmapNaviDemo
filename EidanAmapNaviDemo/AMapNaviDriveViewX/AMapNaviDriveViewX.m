@@ -541,8 +541,12 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     //起点，终点，沿途的点的绘制
     [self updateRoutePointAnnotation];
     
-    //锁车模式下，地图的中心点，缩放级别，摄像机角度
-    [self changeToNaviModeAtPoint:self.currentNaviRoute.routeStartPoint];
+    //非全览模式下，改变地图的中心点，缩放级别，摄像机角度。全览模式下，不能改变，否则界面按钮选中状态和地图状态不匹配，反正从全览模式到锁车模式changeToNaviModeAtPoint还会被调用
+    if (self.showMode != AMapNaviDriveViewShowModeOverview) {
+        [self changeToNaviModeAtPoint:self.currentNaviRoute.routeStartPoint];
+    } else {  //全览模式下，重新适应一下，让路线都在可视范围内
+        [self showMapRegionWithBounds:self.currentNaviRoute.routeBounds centerCoordinate:self.currentNaviRoute.routeCenterPoint];
+    }
     
     //更新电子眼信息,这里的显示与否取决于zoomLevel.
     [self updateRouteCameraAnnotationWithStartIndex:0];

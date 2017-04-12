@@ -40,7 +40,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 #define kAMapNaviMoveDirectlyMinDistance        1.0f
 
 //views
-//#define KAMapNaviInfoViewTurnIconImage          @"default_navi_action_%ld"
 #define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:39/255.0 green:44/255.0 blue:54/255.0 alpha:1]
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
@@ -1283,7 +1282,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     NSLog(@"addFF : %ld,%lu,%lu,%lu",(long)i,(unsigned long)oriCoordinateArray.count,(unsigned long)self.trafficStatus.count,(unsigned long)resultDrawStyleIndexArray.count);
     
-    //以下这部分终点的处理，目前没测出效果
     //经过上面的循环可能存在一些末尾的点没有添加的情况，总之要将最后一个点对齐到路径终点
     if (i < oriCoordinateArray.count) {
         

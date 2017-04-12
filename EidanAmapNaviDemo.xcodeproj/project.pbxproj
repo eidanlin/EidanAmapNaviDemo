@@ -10,13 +10,6 @@
 		2D03CEF80427266C448CD104 /* libPods-EidanAmapNaviDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1860A8DAF857C28EDB284D25 /* libPods-EidanAmapNaviDemo.a */; };
 		D952C88A1E7101A70076E82F /* AMapNaviKit.podspec in Resources */ = {isa = PBXBuildFile; fileRef = D952C8891E7101A70076E82F /* AMapNaviKit.podspec */; };
 		D9679EB51E9E043A001F52C6 /* AMapNaviDriveViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D171E9E0439001F52C6 /* AMapNaviDriveViewX.m */; };
-		D9679EB61E9E043A001F52C6 /* AMapNaviCarAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D1A1E9E0439001F52C6 /* AMapNaviCarAnnotationViewX.m */; };
-		D9679EB71E9E043A001F52C6 /* AMapNaviCarAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D1C1E9E0439001F52C6 /* AMapNaviCarAnnotationX.m */; };
-		D9679EB81E9E043A001F52C6 /* AMapNaviRouteAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D1E1E9E0439001F52C6 /* AMapNaviRouteAnnotationViewX.m */; };
-		D9679EB91E9E043A001F52C6 /* AMapNaviRouteAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D201E9E0439001F52C6 /* AMapNaviRouteAnnotationX.m */; };
-		D9679EBA1E9E043A001F52C6 /* AMapNaviRoutePolylineX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D221E9E0439001F52C6 /* AMapNaviRoutePolylineX.m */; };
-		D9679EBB1E9E043A001F52C6 /* AMapNaviTrafficBarViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D251E9E0439001F52C6 /* AMapNaviTrafficBarViewX.m */; };
-		D9679EBC1E9E043A001F52C6 /* AMapNaviViewUtilityX.m in Sources */ = {isa = PBXBuildFile; fileRef = D9679D271E9E0439001F52C6 /* AMapNaviViewUtilityX.m */; };
 		D9679EBD1E9E043A001F52C6 /* default_navi_bottom_bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9679D2B1E9E0439001F52C6 /* default_navi_bottom_bg@2x.png */; };
 		D9679EBE1E9E043A001F52C6 /* default_navi_browse_ver_normal@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9679D2C1E9E0439001F52C6 /* default_navi_browse_ver_normal@2x.png */; };
 		D9679EBF1E9E043A001F52C6 /* default_navi_browse_ver_normal_highlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9679D2D1E9E0439001F52C6 /* default_navi_browse_ver_normal_highlighted@2x.png */; };
@@ -406,6 +399,13 @@
 		D967A03F1E9E043A001F52C6 /* default_navi_action_9@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9679EB11E9E043A001F52C6 /* default_navi_action_9@2x.png */; };
 		D967A0401E9E043A001F52C6 /* default_navi_action_9@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = D9679EB21E9E043A001F52C6 /* default_navi_action_9@3x.png */; };
 		D967A0411E9E043A001F52C6 /* AMapNaviDriveViewX.xib in Resources */ = {isa = PBXBuildFile; fileRef = D9679EB41E9E043A001F52C6 /* AMapNaviDriveViewX.xib */; };
+		D967A1DD1E9E07FF001F52C6 /* AMapNaviCarAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A0431E9E07FE001F52C6 /* AMapNaviCarAnnotationViewX.m */; };
+		D967A1DE1E9E07FF001F52C6 /* AMapNaviCarAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A0451E9E07FE001F52C6 /* AMapNaviCarAnnotationX.m */; };
+		D967A1DF1E9E07FF001F52C6 /* AMapNaviRouteAnnotationViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A0471E9E07FE001F52C6 /* AMapNaviRouteAnnotationViewX.m */; };
+		D967A1E01E9E07FF001F52C6 /* AMapNaviRouteAnnotationX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A0491E9E07FE001F52C6 /* AMapNaviRouteAnnotationX.m */; };
+		D967A1E11E9E07FF001F52C6 /* AMapNaviRoutePolylineX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A04B1E9E07FE001F52C6 /* AMapNaviRoutePolylineX.m */; };
+		D967A1E21E9E07FF001F52C6 /* AMapNaviTrafficBarViewX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A04D1E9E07FE001F52C6 /* AMapNaviTrafficBarViewX.m */; };
+		D967A1E31E9E07FF001F52C6 /* AMapNaviViewUtilityX.m in Sources */ = {isa = PBXBuildFile; fileRef = D967A04F1E9E07FE001F52C6 /* AMapNaviViewUtilityX.m */; };
 		D98F9C4F1E28C1560040F730 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C4E1E28C1560040F730 /* main.m */; };
 		D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C511E28C1560040F730 /* AppDelegate.m */; };
 		D98F9C551E28C1560040F730 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D98F9C541E28C1560040F730 /* ViewController.m */; };
@@ -429,20 +429,6 @@
 		D952C8891E7101A70076E82F /* AMapNaviKit.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AMapNaviKit.podspec; sourceTree = "<group>"; };
 		D9679D161E9E0439001F52C6 /* AMapNaviDriveViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviDriveViewX.h; sourceTree = "<group>"; };
 		D9679D171E9E0439001F52C6 /* AMapNaviDriveViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviDriveViewX.m; sourceTree = "<group>"; };
-		D9679D191E9E0439001F52C6 /* AMapNaviCarAnnotationViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviCarAnnotationViewX.h; sourceTree = "<group>"; };
-		D9679D1A1E9E0439001F52C6 /* AMapNaviCarAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviCarAnnotationViewX.m; sourceTree = "<group>"; };
-		D9679D1B1E9E0439001F52C6 /* AMapNaviCarAnnotationX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviCarAnnotationX.h; sourceTree = "<group>"; };
-		D9679D1C1E9E0439001F52C6 /* AMapNaviCarAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviCarAnnotationX.m; sourceTree = "<group>"; };
-		D9679D1D1E9E0439001F52C6 /* AMapNaviRouteAnnotationViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationViewX.h; sourceTree = "<group>"; };
-		D9679D1E1E9E0439001F52C6 /* AMapNaviRouteAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationViewX.m; sourceTree = "<group>"; };
-		D9679D1F1E9E0439001F52C6 /* AMapNaviRouteAnnotationX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationX.h; sourceTree = "<group>"; };
-		D9679D201E9E0439001F52C6 /* AMapNaviRouteAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationX.m; sourceTree = "<group>"; };
-		D9679D211E9E0439001F52C6 /* AMapNaviRoutePolylineX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRoutePolylineX.h; sourceTree = "<group>"; };
-		D9679D221E9E0439001F52C6 /* AMapNaviRoutePolylineX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRoutePolylineX.m; sourceTree = "<group>"; };
-		D9679D241E9E0439001F52C6 /* AMapNaviTrafficBarViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviTrafficBarViewX.h; sourceTree = "<group>"; };
-		D9679D251E9E0439001F52C6 /* AMapNaviTrafficBarViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviTrafficBarViewX.m; sourceTree = "<group>"; };
-		D9679D261E9E0439001F52C6 /* AMapNaviViewUtilityX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviViewUtilityX.h; sourceTree = "<group>"; };
-		D9679D271E9E0439001F52C6 /* AMapNaviViewUtilityX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviViewUtilityX.m; sourceTree = "<group>"; };
 		D9679D2B1E9E0439001F52C6 /* default_navi_bottom_bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_bottom_bg@2x.png"; sourceTree = "<group>"; };
 		D9679D2C1E9E0439001F52C6 /* default_navi_browse_ver_normal@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_browse_ver_normal@2x.png"; sourceTree = "<group>"; };
 		D9679D2D1E9E0439001F52C6 /* default_navi_browse_ver_normal_highlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_browse_ver_normal_highlighted@2x.png"; sourceTree = "<group>"; };
@@ -832,6 +818,20 @@
 		D9679EB11E9E043A001F52C6 /* default_navi_action_9@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_action_9@2x.png"; sourceTree = "<group>"; };
 		D9679EB21E9E043A001F52C6 /* default_navi_action_9@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_navi_action_9@3x.png"; sourceTree = "<group>"; };
 		D9679EB41E9E043A001F52C6 /* AMapNaviDriveViewX.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AMapNaviDriveViewX.xib; sourceTree = "<group>"; };
+		D967A0421E9E07FE001F52C6 /* AMapNaviCarAnnotationViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviCarAnnotationViewX.h; sourceTree = "<group>"; };
+		D967A0431E9E07FE001F52C6 /* AMapNaviCarAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviCarAnnotationViewX.m; sourceTree = "<group>"; };
+		D967A0441E9E07FE001F52C6 /* AMapNaviCarAnnotationX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviCarAnnotationX.h; sourceTree = "<group>"; };
+		D967A0451E9E07FE001F52C6 /* AMapNaviCarAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviCarAnnotationX.m; sourceTree = "<group>"; };
+		D967A0461E9E07FE001F52C6 /* AMapNaviRouteAnnotationViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationViewX.h; sourceTree = "<group>"; };
+		D967A0471E9E07FE001F52C6 /* AMapNaviRouteAnnotationViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationViewX.m; sourceTree = "<group>"; };
+		D967A0481E9E07FE001F52C6 /* AMapNaviRouteAnnotationX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRouteAnnotationX.h; sourceTree = "<group>"; };
+		D967A0491E9E07FE001F52C6 /* AMapNaviRouteAnnotationX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRouteAnnotationX.m; sourceTree = "<group>"; };
+		D967A04A1E9E07FE001F52C6 /* AMapNaviRoutePolylineX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviRoutePolylineX.h; sourceTree = "<group>"; };
+		D967A04B1E9E07FE001F52C6 /* AMapNaviRoutePolylineX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviRoutePolylineX.m; sourceTree = "<group>"; };
+		D967A04C1E9E07FE001F52C6 /* AMapNaviTrafficBarViewX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviTrafficBarViewX.h; sourceTree = "<group>"; };
+		D967A04D1E9E07FE001F52C6 /* AMapNaviTrafficBarViewX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviTrafficBarViewX.m; sourceTree = "<group>"; };
+		D967A04E1E9E07FE001F52C6 /* AMapNaviViewUtilityX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AMapNaviViewUtilityX.h; sourceTree = "<group>"; };
+		D967A04F1E9E07FE001F52C6 /* AMapNaviViewUtilityX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AMapNaviViewUtilityX.m; sourceTree = "<group>"; };
 		D98F9C4A1E28C1560040F730 /* EidanAmapNaviDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EidanAmapNaviDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D98F9C4E1E28C1560040F730 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		D98F9C501E28C1560040F730 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -890,39 +890,23 @@
 			children = (
 				D9679D161E9E0439001F52C6 /* AMapNaviDriveViewX.h */,
 				D9679D171E9E0439001F52C6 /* AMapNaviDriveViewX.m */,
-				D9679D181E9E0439001F52C6 /* AMapNaviMapX */,
-				D9679D231E9E0439001F52C6 /* AMapNaviViewX */,
+				D967A04C1E9E07FE001F52C6 /* AMapNaviTrafficBarViewX.h */,
+				D967A04D1E9E07FE001F52C6 /* AMapNaviTrafficBarViewX.m */,
+				D967A0421E9E07FE001F52C6 /* AMapNaviCarAnnotationViewX.h */,
+				D967A0431E9E07FE001F52C6 /* AMapNaviCarAnnotationViewX.m */,
+				D967A0441E9E07FE001F52C6 /* AMapNaviCarAnnotationX.h */,
+				D967A0451E9E07FE001F52C6 /* AMapNaviCarAnnotationX.m */,
+				D967A0461E9E07FE001F52C6 /* AMapNaviRouteAnnotationViewX.h */,
+				D967A0471E9E07FE001F52C6 /* AMapNaviRouteAnnotationViewX.m */,
+				D967A0481E9E07FE001F52C6 /* AMapNaviRouteAnnotationX.h */,
+				D967A0491E9E07FE001F52C6 /* AMapNaviRouteAnnotationX.m */,
+				D967A04A1E9E07FE001F52C6 /* AMapNaviRoutePolylineX.h */,
+				D967A04B1E9E07FE001F52C6 /* AMapNaviRoutePolylineX.m */,
+				D967A04E1E9E07FE001F52C6 /* AMapNaviViewUtilityX.h */,
+				D967A04F1E9E07FE001F52C6 /* AMapNaviViewUtilityX.m */,
 				D9679D281E9E0439001F52C6 /* Resources */,
 			);
 			path = AMapNaviDriveViewX;
-			sourceTree = "<group>";
-		};
-		D9679D181E9E0439001F52C6 /* AMapNaviMapX */ = {
-			isa = PBXGroup;
-			children = (
-				D9679D191E9E0439001F52C6 /* AMapNaviCarAnnotationViewX.h */,
-				D9679D1A1E9E0439001F52C6 /* AMapNaviCarAnnotationViewX.m */,
-				D9679D1B1E9E0439001F52C6 /* AMapNaviCarAnnotationX.h */,
-				D9679D1C1E9E0439001F52C6 /* AMapNaviCarAnnotationX.m */,
-				D9679D1D1E9E0439001F52C6 /* AMapNaviRouteAnnotationViewX.h */,
-				D9679D1E1E9E0439001F52C6 /* AMapNaviRouteAnnotationViewX.m */,
-				D9679D1F1E9E0439001F52C6 /* AMapNaviRouteAnnotationX.h */,
-				D9679D201E9E0439001F52C6 /* AMapNaviRouteAnnotationX.m */,
-				D9679D211E9E0439001F52C6 /* AMapNaviRoutePolylineX.h */,
-				D9679D221E9E0439001F52C6 /* AMapNaviRoutePolylineX.m */,
-			);
-			path = AMapNaviMapX;
-			sourceTree = "<group>";
-		};
-		D9679D231E9E0439001F52C6 /* AMapNaviViewX */ = {
-			isa = PBXGroup;
-			children = (
-				D9679D241E9E0439001F52C6 /* AMapNaviTrafficBarViewX.h */,
-				D9679D251E9E0439001F52C6 /* AMapNaviTrafficBarViewX.m */,
-				D9679D261E9E0439001F52C6 /* AMapNaviViewUtilityX.h */,
-				D9679D271E9E0439001F52C6 /* AMapNaviViewUtilityX.m */,
-			);
-			path = AMapNaviViewX;
 			sourceTree = "<group>";
 		};
 		D9679D281E9E0439001F52C6 /* Resources */ = {
@@ -1974,21 +1958,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9679EB91E9E043A001F52C6 /* AMapNaviRouteAnnotationX.m in Sources */,
-				D9679EBC1E9E043A001F52C6 /* AMapNaviViewUtilityX.m in Sources */,
+				D967A1E01E9E07FF001F52C6 /* AMapNaviRouteAnnotationX.m in Sources */,
+				D967A1E31E9E07FF001F52C6 /* AMapNaviViewUtilityX.m in Sources */,
 				D9DD04DC1E5EE969009C542F /* GPSEmulatorViewController.m in Sources */,
 				D9679EB51E9E043A001F52C6 /* AMapNaviDriveViewX.m in Sources */,
-				D9679EB61E9E043A001F52C6 /* AMapNaviCarAnnotationViewX.m in Sources */,
+				D967A1DD1E9E07FF001F52C6 /* AMapNaviCarAnnotationViewX.m in Sources */,
 				D98F9C671E28C4330040F730 /* NaviTestViewController.m in Sources */,
 				D9DD04E41E5EE9A6009C542F /* GPSEmulator.m in Sources */,
 				D98F9C551E28C1560040F730 /* ViewController.m in Sources */,
 				D98F9C521E28C1560040F730 /* AppDelegate.m in Sources */,
-				D9679EBB1E9E043A001F52C6 /* AMapNaviTrafficBarViewX.m in Sources */,
-				D9679EBA1E9E043A001F52C6 /* AMapNaviRoutePolylineX.m in Sources */,
-				D9679EB81E9E043A001F52C6 /* AMapNaviRouteAnnotationViewX.m in Sources */,
+				D967A1E21E9E07FF001F52C6 /* AMapNaviTrafficBarViewX.m in Sources */,
+				D967A1E11E9E07FF001F52C6 /* AMapNaviRoutePolylineX.m in Sources */,
+				D967A1DF1E9E07FF001F52C6 /* AMapNaviRouteAnnotationViewX.m in Sources */,
 				D98F9F3F1E28CF670040F730 /* SpeechSynthesizer.m in Sources */,
 				D98F9C4F1E28C1560040F730 /* main.m in Sources */,
-				D9679EB71E9E043A001F52C6 /* AMapNaviCarAnnotationX.m in Sources */,
+				D967A1DE1E9E07FF001F52C6 /* AMapNaviCarAnnotationX.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,9 +11,9 @@ Pod::Spec.new do |s|
                     LICENSE
     }
   s.author       = { 'eidanlin' => 'wenan_39141@163.com' }
-  s.source       = { :git => "https://github.com/eidanlin/EidanAmapNaviDemo.git", :tag => "v0.0.1" }
+  s.source       = { :git => "https://github.com/eidanlin/EidanAmapNaviDemo.git", :commit => "8e134a0" }
   s.source_files  = "EidanAmapNaviDemo/AMapNaviDriveViewX/*"
-  s.resources = 'EidanAmapNaviDemo/**/*.{png,xib}'
+  s.resources = 'EidanAmapNaviDemo/AMapNaviDriveViewX/Resources/**/*.{png,xib}'
   s.platform     = :ios, '8.0'
   s.requires_arc = true
   s.frameworks = 'CoreLocation', 'SystemConfiguration', 'CoreTelephony', 'Security'

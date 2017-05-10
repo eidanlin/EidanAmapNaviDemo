@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "EidanAmapNaviKit"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "基于高德导航SDK的自定义驾车导航界面"
   s.description  = <<-DESC
                     利用高德地图导航SDK，自定义驾车导航界面
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
                     LICENSE
     }
   s.author       = { 'eidanlin' => 'wenan_39141@163.com' }
-  s.source       = { :git => "https://github.com/eidanlin/EidanAmapNaviDemo.git", :commit => "8e134a0" }
+  s.source       = { :git => "https://github.com/eidanlin/EidanAmapNaviDemo.git", :tag => "v0.0.2" }
   s.source_files  = "EidanAmapNaviDemo/AMapNaviDriveViewX/*"
   s.resources = 'EidanAmapNaviDemo/AMapNaviDriveViewX/Resources/**/*.{png,xib}'
   s.platform     = :ios, '8.0'

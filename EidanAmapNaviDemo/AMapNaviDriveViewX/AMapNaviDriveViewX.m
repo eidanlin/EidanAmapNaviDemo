@@ -114,6 +114,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet UIButton *rightBrowserBtn;
 @property (nonatomic, weak) IBOutlet UIButton *rightSwitchTrafficBtn;
 @property (nonatomic, weak) IBOutlet AMapNaviTrafficBarViewX *rightTrafficBarView;
+@property (nonatomic, weak) IBOutlet UIButton *zoomInBtn;  //放大
+@property (nonatomic, weak) IBOutlet UIButton *zoomOutBtn; //缩小
 
 //constraint portrait
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightPortrait;
@@ -312,17 +314,18 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.lockCarPosition = NO;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = NO;
-    self.rightSwitchTrafficBtn.hidden = NO;
+    self.rightSwitchTrafficBtn.hidden = self.zoomInBtn.superview.hidden = NO;
     self.rightBrowserBtn.hidden = self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
     
-    [self handleRightTrafficBarViewShowOrHide];
+    [self handleWhenCrossImageShowAndHide:nil];
+//    [self handleRightTrafficBarViewShowOrHide]; // [self handleWhenCrossImageShowAndHide:nil]里面已经调用了handleRightTrafficBarViewShowOrHide，所以先注释掉
 }
 
 - (void)handleShowModeToLockedCarPosition {
     self.lockCarPosition = YES;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = YES;
-    self.rightSwitchTrafficBtn.hidden = YES;
+    self.rightSwitchTrafficBtn.hidden = self.zoomInBtn.superview.hidden = YES;
     self.rightBrowserBtn.hidden = YES;
     
     [self handleRightTrafficBarViewShowOrHide];
@@ -368,7 +371,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     MACoordinateRegion region = MACoordinateRegionMake(centerCoordinate, MACoordinateSpanMake(latitudeDelta, longitudeDelta));
     MAMapRect mapRect = MAMapRectForCoordinateRegion(region);
     
-    UIEdgeInsets insets = UIEdgeInsetsMake(30, 30, 30, 30);
+    UIEdgeInsets insets = UIEdgeInsetsMake(80, 80, 80, 80);
     
     [self.internalMapView setRotationDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
     [self.internalMapView setCameraDegree:0 animated:YES duration:kAMapNaviInternalAnimationDuration];
@@ -630,24 +633,12 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //需要显示路口放大图了
 - (void)driveManager:(AMapNaviDriveManager *)driveManager showCrossImage:(UIImage *)crossImage {
-    
-    if (crossImage) {
-        self.crossImageView.image = crossImage;
-        self.crossImageView.hidden = NO;
-        self.showMode = AMapNaviDriveViewShowModeCarPositionLocked; //如果有路口放大图，恢复锁车模式
-    }
-    
-    [self handleWhenCrossImageShowAndHide];
+    [self handleWhenCrossImageShowAndHide:crossImage];
 }
 
 //需要把路口放大图了隐藏了
 - (void)driveManagerHideCrossImage:(AMapNaviDriveManager *)driveManager {
-    
-    self.crossImageView.image = nil;
-    self.crossImageView.hidden = YES;
-    
-    [self handleWhenCrossImageShowAndHide];
-    
+    [self handleWhenCrossImageShowAndHide:nil];
 }
 
 //需要显示车道信息了
@@ -747,14 +738,18 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 #pragma -mark 路口放大图
 
 
-- (void)handleWhenCrossImageShowAndHide {
+- (void)handleWhenCrossImageShowAndHide:(UIImage *)crossImage {
     
-    if (self.crossImageView.image) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
+    //1.有图，且锁车模式，才显示路口放大图
+    //2.目前有路口放大图，变成非锁车模式后，里面干掉路口放大图
+    if (crossImage && self.showMode == AMapNaviDriveViewShowModeCarPositionLocked) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
+        self.crossImageView.image = crossImage;
         self.mapViewTopPortrait.constant = self.topInfoViewHeightInCrossModePortrait.constant;  //竖屏下
         self.mapViewLeftLandscape.constant = self.crossImageViewWidthLandScape.constant;  //横屏下
         self.topInfoContainerViewInCrossMode.hidden = NO;
         
     } else {
+        self.crossImageView.image = nil;
         self.mapViewTopPortrait.constant = self.topInfoViewHeightPortrait.constant;  //竖屏下
         self.mapViewLeftLandscape.constant = self.topInfoViewWidthLandscape.constant;  //横屏下
         self.topInfoContainerViewInCrossMode.hidden = YES;
@@ -839,17 +834,24 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)configureRightTipsView {
     self.rightBrowserBtn.hidden = YES;
     self.rightSwitchTrafficBtn.hidden = YES;
+    self.zoomInBtn.superview.hidden = YES;
+    [self updateZoomButtonState];
 }
 
 
 - (void)handleRightTrafficBarViewShowOrHide {
     
-    //只有在锁车模式，且没有路口放大图，才会有光柱图
+    //只有在锁车模式，且没有路口放大图，才会有光柱图,其实，现在的逻辑就是锁车，一定不会有路口放大图了，所以 && self.crossImageView.image == nil 有点多余
     if (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked && self.crossImageView.image == nil) {
         self.rightTrafficBarView.hidden = NO;
     } else {
         self.rightTrafficBarView.hidden = YES;
     }
+}
+
+- (void)updateZoomButtonState {
+    self.zoomInBtn.enabled = self.internalMapView.zoomLevel < self.internalMapView.maxZoomLevel;
+    self.zoomOutBtn.enabled = self.internalMapView.zoomLevel > self.internalMapView.minZoomLevel;
 }
 
 #pragma -mark Xib btns click
@@ -896,6 +898,17 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     btn.selected = !btn.selected;
 }
+
+- (IBAction)zoomInButtonAction:(id)sender {
+    [self.internalMapView setZoomLevel:(self.internalMapView.zoomLevel + 1.0) animated:YES];
+    [self updateZoomButtonState];
+}
+
+- (IBAction)zoomOutButtonAction:(id)sender {
+    [self.internalMapView setZoomLevel:(self.internalMapView.zoomLevel - 1.0) animated:YES];
+    [self updateZoomButtonState];
+}
+
 
 
 - (IBAction)goBack:(id)sender {
@@ -1385,6 +1398,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //        [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO]; 这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。貌似地图5.0.0后，不用处理平行的问题。
         [self updateRouteCameraAnnotationWithStartIndex:0]; //实现全览或者地图缩放的比较小，摄像头不画，放大到一定程度，又有摄像头
         [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos]; //同上
+        
+        [self updateZoomButtonState]; //更新zoomButtonState
     }
     
 }

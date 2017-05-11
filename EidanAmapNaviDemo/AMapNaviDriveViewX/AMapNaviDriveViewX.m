@@ -40,7 +40,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 #define kAMapNaviMoveDirectlyMinDistance        1.0f
 
 //views
-#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:39/255.0 green:44/255.0 blue:54/255.0 alpha:1]
+#define kAMapNaviInfoViewBackgroundColor        [UIColor colorWithRed:30/255.0 green:33/255.0 blue:42/255.0 alpha:1]
 
 @interface AMapNaviDriveViewX ()<MAMapViewDelegate>
 
@@ -79,7 +79,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //牵引线
 @property (nonatomic, strong) AMapNaviGuidePolylineX *carToDestinationGuidePolyline;
 
-#pragma -mark xib views
+//xib views
 @property (nonatomic, strong) IBOutlet UIView *customView;
 
 //mapView
@@ -132,6 +132,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @implementation AMapNaviDriveViewX
 
 
+#pragma mark - LifeCycle
+
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
@@ -150,16 +152,26 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     return self;
 }
 
+- (void)dealloc {
+    NSLog(@"----------- driveViewX dealloc");
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self stopMoveCarTimer];
+    self.internalMapView.delegate = nil;
+}
+
+#pragma mark -Init
+
 - (void)setUp {
     
-    //public
+    //self
     [[NSBundle mainBundle] loadNibNamed:@"AMapNaviDriveViewX" owner:self options:nil];
     [self addSubview:self.customView];
     self.customView.frame = self.bounds;
     self.customView.backgroundColor = kAMapNaviInfoViewBackgroundColor;
+    self.customView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     //监听设备方向。
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientaionChanged) name:UIDeviceOrientationDidChangeNotification object:NULL];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientaionChanged) name:UIDeviceOrientationDidChangeNotification object:NULL];
     
     //layoutConstraint
     [self configureTheConstraint];
@@ -193,17 +205,18 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     float shorterSide = MIN([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);  //较短的一边
     float longerSide = MAX([UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);   //较长的一边
     
-    //SDK给出的路口放大图的尺寸
+    //SDK给出的路口放大图的尺寸(500*320)
     float crossImageOriginWidth = 500.0;
-    float crossImageOriginHeight = 320.0;
+    float crossImageOriginHeightInLPortrait = 320.0;  //竖屏
+    float crossImageOriginHeightInLandscape = 382.0;  //横屏不按照SDK给，做了微调。
     
     //以下不管横竖屏，都是希望算出图片按比例缩放后应有的高度，来保证不变形
     //横屏下的计算，使用较长的一边作为顶边
     self.crossImageViewWidthLandScape.constant = longerSide / 2;
-    self.crossImageViewHeightLandscape.constant = self.crossImageViewWidthLandScape.constant * crossImageOriginHeight / crossImageOriginWidth + 30;  //30为微调，加了30可以不显得那么空，但会变形，但可以接受。
+    self.crossImageViewHeightLandscape.constant = self.crossImageViewWidthLandScape.constant * crossImageOriginHeightInLandscape / crossImageOriginWidth;
     
     //竖屏的计算，使用较短的一边作为顶边
-    self.topInfoViewHeightInCrossModePortrait.constant = shorterSide * crossImageOriginHeight / crossImageOriginWidth + 20 + 50;  //20为状态栏高度，50为信息横条所占的高度
+    self.topInfoViewHeightInCrossModePortrait.constant = shorterSide * crossImageOriginHeightInLPortrait / crossImageOriginWidth + 20 + 50;  //20为状态栏高度，50为信息横条所占的高度
     
 }
 
@@ -225,19 +238,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     //private
     self.lockCarPosition = YES;
     
-}
-
-- (void)layoutSubviews {
-    self.customView.frame = self.bounds;
-}
-
-#pragma -mark dealloc
-
-- (void)dealloc {
-    NSLog(@"----------- driveViewX dealloc");
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self stopMoveCarTimer];
-    self.internalMapView.delegate = nil;
 }
 
 #pragma -mark Interface
@@ -327,7 +327,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     [self handleRightTrafficBarViewShowOrHide];
     
-    
     //恢复锁车模式，设置地图和车为正确状态，特别是车的倾斜角度,先把地图的倾斜角度设置对了，根据地图的倾斜角度设置车，顺序不能乱，设置车的倾斜角度中，也要设置地图的旋转角度
     if (self.carAnnotation) {
         [self changeToNaviModeAtPoint:[AMapNaviPoint locationWithLatitude:self.carAnnotation.coordinate.latitude longitude:self.carAnnotation.coordinate.longitude]];
@@ -336,6 +335,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //如果从缩小到很小的非锁车模式（这个时候是没有电子眼图标的）直接点击“继续导航”，变成锁车模式，需要电子眼图标，所以需要画出来，不加这句话，就没有
     [self updateRouteCameraAnnotationWithStartIndex:0];
+    [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos];
 }
 
 - (void)handleShowModeToOverview {
@@ -686,7 +686,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         
         AMapNaviPoint *coordinate = nil;
         
-        //高德地图和百度地图，如果导航的起点设置在离目前定位点很远的地方，是直接跳到导航起点开始导航，但是只要一移动(自车位置一回调)，车图标就会定位到当前位置，并触发偏航重算。所以我们先把车的初始位置放在起点，然后GPS导航中，自车位置从自车位置回调中取，模拟导航中，自车位置从导航信息回调中取
+        //高德地图和百度地图，如果导航的起点设置在离目前定位点很远的地方，是直接跳到导航起点开始导航，但是只要一移动(自车位置一回调)，车图标就会定位到当前位置，并触发偏航重算。所以我们先把车的初始位置放在起点.
         if (self.currentNaviRoute.routeStartPoint) {
             coordinate = self.currentNaviRoute.routeStartPoint;
         }
@@ -771,7 +771,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.laneInfoView.hidden = YES;
 }
 
-#pragma -mark topInfoView
+#pragma -mark TopInfoView
 
 - (void)configureTopInfoView {
     self.topInfoView.superview.backgroundColor = kAMapNaviInfoViewBackgroundColor;
@@ -808,7 +808,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
 }
 
-#pragma -mark bottomInfoView
+#pragma -mark BottomInfoView
 
 - (void)configureBottomInfoView {
     self.bottomRemainBgView.hidden = YES;
@@ -834,7 +834,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
 }
 
-#pragma -mark rightTipsView
+#pragma -mark RightTipsView
 
 - (void)configureRightTipsView {
     self.rightBrowserBtn.hidden = YES;
@@ -852,7 +852,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
 }
 
-#pragma -mark xib btns click
+#pragma -mark Xib btns click
 
 //更多按钮点击
 - (IBAction)moreBtnClick:(id)sender {
@@ -1279,8 +1279,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         }
         
     }
-    
-    NSLog(@"addFF : %ld,%lu,%lu,%lu",(long)i,(unsigned long)oriCoordinateArray.count,(unsigned long)self.trafficStatus.count,(unsigned long)resultDrawStyleIndexArray.count);
     
     //经过上面的循环可能存在一些末尾的点没有添加的情况，总之要将最后一个点对齐到路径终点
     if (i < oriCoordinateArray.count) {

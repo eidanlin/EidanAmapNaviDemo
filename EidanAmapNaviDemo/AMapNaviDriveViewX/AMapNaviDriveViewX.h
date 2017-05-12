@@ -15,20 +15,61 @@
 
 @property (nonatomic, weak) id<AMapNaviDriveViewXDelegate> delegate;
 
+#pragma mark - Options
+
+///导航界面跟随模式,默认AMapNaviViewTrackingModeCarNorth（车头朝北）
+@property (nonatomic, assign) AMapNaviViewTrackingMode trackingMode;
+
+///导航界面显示模式,默认AMapNaviDriveViewShowModeCarPositionLocked
+@property (nonatomic, assign) AMapNaviDriveViewShowMode showMode;
+
+///是否显示界面元素,默认YES
+@property (nonatomic, assign) BOOL showUIElements;
+
+///是否显示摄像头,默认YES
+@property (nonatomic, assign) BOOL showCamera;
+
+///是否显示路口放大图,默认YES
+@property (nonatomic, assign) BOOL showCrossImage;
+
+///是否黑夜模式,默认NO. 对应的地图样式为:白天模式MAMapTypeNavi,黑夜模式MAMapTypeStandardNight.
+@property (nonatomic, assign) BOOL showStandardNightType;
+
+///是否显示全览按钮,默认YES
+@property (nonatomic, assign) BOOL showBrowseRouteButton;
+
+#warning 目前还没有完全实现，需要UI配合
+///是否显示更多按钮,默认YES
+@property (nonatomic, assign) BOOL showMoreButton;
+
+///是否显示路况光柱,默认YES
+@property (nonatomic, assign) BOOL showTrafficBar;
+
+///是否显示实时交通按钮,默认YES
+@property (nonatomic, assign) BOOL showTrafficButton;
+
+///是否显示实时交通图层,默认YES
+@property (nonatomic, assign) BOOL showTrafficLayer;
+
+///是否显示转向箭头,默认YES
+@property (nonatomic, assign) BOOL showTurnArrow;
+
+
+
+
 ///规划路径overlay的宽度
 @property (nonatomic, assign) CGFloat lineWidth;
 
 ///锁车状态下地图cameraDegree, 默认30.0, 范围[0,60]
 @property (nonatomic, assign) CGFloat cameraDegree;
 
-///是否显示实时交通图层,默认YES
-@property (nonatomic, assign) BOOL showTrafficLayer;
 
-///导航界面显示模式,默认AMapNaviDriveViewShowModeCarPositionLocked
-@property (nonatomic, assign) AMapNaviDriveViewShowMode showMode;  //不管什么模式，车一直都是在运动的，区分的只有地图的状态
 
-//跟随模式：车头朝北，地图朝北，默认AMapNaviViewTrackingModeCarNorth（车头朝北）
-@property (nonatomic, assign) AMapNaviViewTrackingMode trackingMode;  //其实更改跟随模式，只在lockCarPosition为YES，即锁车显示模式才有效果，此时地图的状态是跟着变的，而如果showMode为其他显示模式，地图不跟着动，就无所谓怎么跟随了
+
+
+///当前地图是否开启自定义样式, 默认NO. 设置为YES，将忽略showStandardNightType的设置，并将mapType切换为MAMapTypeStandard. 设置为NO，将根据showStandardNightType恢复mapType. since 5.1.0
+@property (nonatomic, assign) BOOL customMapStyleEnabled;
+
 
 
 @end

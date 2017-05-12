@@ -34,6 +34,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 #define kAMapNaviShowCameraMinZoomLevel         16.0f
 
 #define kAMapNaviTurnArrowDistance              20.0f
+#define kAMapNaviShowTurnArrowMaxZoomLevel      19.0f
 #define kAMapNaviShowTurnArrowMinZoomLevel      16.0f
 
 #define kAMapNaviMoveDirectlyMaxDistance        300.0f
@@ -101,7 +102,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet UILabel *topTurnRemainLabelInCrossMode;
 @property (nonatomic, weak) IBOutlet UILabel *topRoadLabelInCrossMode;
 
-
 //bottomInfoView
 @property (nonatomic, weak) IBOutlet UIView *bottomInfoView;
 @property (nonatomic, weak) IBOutlet UIView *bottomRemainBgView;
@@ -117,16 +117,24 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet UIButton *zoomInBtn;  //放大
 @property (nonatomic, weak) IBOutlet UIButton *zoomOutBtn; //缩小
 
+//constraint both
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightBrowserBtnHeight;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightSwitchTrafficBtnHeight;
+
 //constraint portrait
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightPortrait;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopPortrait;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightInCrossModePortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnWidthPortrait;
+
 
 //constraint landscape
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewWidthLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewLeftLandscape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthLandScape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnHeightLandscape;
 
 
 @end
@@ -225,12 +233,22 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)initProperties {
     
     //public
-    self.trackingMode = AMapNaviViewTrackingModeCarNorth;
-    //以下几个变量都有重写setter，这边应该写成 _lineWidth = kAMapNaviRoutePolylineDefaultWidth 这种不会调用setter的写法，但是这几个变量，不写也没关系，因为即使走了setter也都会被return回来
-    self.lineWidth = AMapNaviRoutePolylineDefaultWidth;
-    self.cameraDegree = kAMapNaviLockStateCameraDegree;
-    self.showTrafficLayer = YES;
+    _trackingMode = AMapNaviViewTrackingModeCarNorth;
     self.showMode = AMapNaviRideViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
+    _showUIElements = YES;
+    _showCamera = YES;
+    _showCrossImage = YES;
+    _showStandardNightType = NO;
+    _showBrowseRouteButton = YES;
+    _showMoreButton = YES;
+    _showTrafficBar = YES;
+    _showTrafficButton = YES;
+    _showTrafficLayer = YES;
+    _showTurnArrow = YES;
+    
+    _lineWidth = AMapNaviRoutePolylineDefaultWidth;
+    _cameraDegree = kAMapNaviLockStateCameraDegree;
+    
     
     
     //car and map move
@@ -244,9 +262,146 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 #pragma -mark Interface
 
+- (void)setTrackingMode:(AMapNaviViewTrackingMode)trackingMode {
+    _trackingMode = trackingMode;
+    [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:YES];  //如果是GPS导航，不移动位置，或者说导航信息没有更新，timer没有在走，这个时候你改变跟随模式，是没有效果的，所以为了一更改跟随模式就有效果，需要重设一下车和地图的状态
+}
+
+- (void)setShowUIElements:(BOOL)showUIElements {
+    
+    if (_showUIElements == showUIElements) {
+        return;
+    }
+    
+    _showUIElements = showUIElements;
+    
+    if (showUIElements) {  //显示UI
+        self.mapViewTopPortrait.constant = self.topInfoViewHeightPortrait.constant;
+        self.mapViewLeftLandscape.constant = self.topInfoViewWidthLandscape.constant;
+        self.mapViewTopLandscape.constant = 20;
+        self.internalMapView.layer.zPosition = 0;
+        for (UIView *view in self.internalMapView.superview.subviews) {
+            view.userInteractionEnabled = YES;
+        }
+        [self handleWhenCrossImageShowAndHide:nil];  //显示UI后，必须让路口放大图没有，否则会有bug。
+    } else {
+        self.mapViewTopPortrait.constant = 0;
+        self.mapViewLeftLandscape.constant = 0;
+        self.mapViewTopLandscape.constant = 0;
+        self.internalMapView.layer.zPosition = 1;  //不能用bringSubviewToFront:，因为初始化的时候不起作用，而且屏幕旋转方向后，又会归位
+        for (UIView *view in self.internalMapView.superview.subviews) {  //改变zPosition后，挡住地图的元素还会接受事件，应该让其他元素不能接受事件
+            if (view != self.internalMapView) {
+                view.userInteractionEnabled = NO;
+            }
+        }
+    }
+    
+}
+
+- (void)setShowCamera:(BOOL)showCamera {
+    
+    if (_showCamera == showCamera) {
+        return;
+    }
+    
+    _showCamera = showCamera;
+    
+    [self updateRouteCameraAnnotationWithStartIndex:0];
+    [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos];
+}
+
+- (void)setShowCrossImage:(BOOL)showCrossImage {
+    
+    if (_showCrossImage == showCrossImage) {
+        return;
+    }
+    
+    _showCrossImage = showCrossImage;
+    
+    [self handleWhenCrossImageShowAndHide:nil];
+}
+
+- (void)setShowStandardNightType:(BOOL)showStandardNightType {
+    
+    _showStandardNightType = showStandardNightType;
+    
+    [self setCustomMapStyleEnabled:NO];  //如果黑夜模式，把自定义模式关掉
+    
+    self.internalMapView.mapType = showStandardNightType ? MAMapTypeStandardNight : MAMapTypeNavi;
+    
+}
+
+- (void)setShowBrowseRouteButton:(BOOL)showBrowseRouteButton {
+    
+    if (_showBrowseRouteButton == showBrowseRouteButton) {
+        return;
+    }
+    
+    _showBrowseRouteButton = showBrowseRouteButton;
+    self.rightBrowserBtnHeight.constant = showBrowseRouteButton ? 53 : 0;
+    
+//    [self handleRightBrowserBtnShowOrHide];
+}
+
+- (void)setShowMoreButton:(BOOL)showMoreButton {
+    
+    if (_showMoreButton == showMoreButton) {
+        return;
+    }
+    
+    _showMoreButton = showMoreButton;
+    
+    if (showMoreButton) {
+        self.setMoreBtnWidthPortrait.constant = 49;
+        self.setMoreBtnHeightLandscape.constant = 53;
+    } else {
+        self.setMoreBtnWidthPortrait.constant = 0;
+        self.setMoreBtnHeightLandscape.constant = 0;
+    }
+}
+
+- (void)setShowTrafficBar:(BOOL)showTrafficBar {
+    
+    if (_showTrafficBar == showTrafficBar) {
+        return;
+    }
+    
+    _showTrafficBar = showTrafficBar;
+    
+    [self handleRightTrafficBarViewShowOrHide];
+    
+}
+
+- (void)setShowTrafficButton:(BOOL)showTrafficButton {
+    
+    if (_showTrafficButton == showTrafficButton) {
+        return;
+    }
+    
+    _showTrafficButton = showTrafficButton;
+    self.rightSwitchTrafficBtnHeight.constant = showTrafficButton ? 53 : 0;
+    
+}
+
+
 - (void)setShowTrafficLayer:(BOOL)showTrafficLayer {
+    
     _showTrafficLayer = showTrafficLayer;
+    
+    self.rightSwitchTrafficBtn.selected = !showTrafficLayer;
     self.internalMapView.showTraffic = showTrafficLayer;
+}
+
+- (void)setShowTurnArrow:(BOOL)showTurnArrow {
+    
+    if (_showTurnArrow == showTurnArrow) {
+        return;
+    }
+    
+    _showTurnArrow = showTurnArrow;
+    
+    [self updateRouteTurnArrowPolylineWithSegmentIndex:self.currentNaviInfo.currentSegmentIndex];
+    
 }
 
 - (void)setLineWidth:(CGFloat)lineWidth {
@@ -264,9 +419,19 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
 }
 
-- (void)setTrackingMode:(AMapNaviViewTrackingMode)trackingMode {
-    _trackingMode = trackingMode;
-    [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:YES];  //如果是GPS导航，不移动位置，或者说导航信息没有更新，timer没有在走，这个时候你改变跟随模式，是没有效果的，所以为了一更改跟随模式就有效果，需要重设一下车和地图的状态
+- (BOOL)customMapStyleEnabled {
+    return self.internalMapView.customMapStyleEnabled;
+}
+
+- (void)setCustomMapStyleEnabled:(BOOL)customMapStyleEnabled {
+    
+    if (customMapStyleEnabled) {
+        self.internalMapView.mapType = MAMapTypeStandard;
+    } else {
+        self.internalMapView.mapType = _showStandardNightType ? MAMapTypeStandardNight : MAMapTypeNavi;
+    }
+    
+    [self.internalMapView setCustomMapStyleEnabled:customMapStyleEnabled];
 }
 
 #pragma -mark 显示模式切换
@@ -314,19 +479,26 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.lockCarPosition = NO;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = NO;
-    self.rightSwitchTrafficBtn.hidden = self.zoomInBtn.superview.hidden = NO;
-    self.rightBrowserBtn.hidden = self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
+    self.rightSwitchTrafficBtn.hidden = NO;
+    self.zoomInBtn.superview.hidden = NO;
+    
+    self.rightBrowserBtn.hidden = NO;
+    self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
+//    [self handleRightBrowserBtnShowOrHide];
     
     [self handleWhenCrossImageShowAndHide:nil];
-//    [self handleRightTrafficBarViewShowOrHide]; // [self handleWhenCrossImageShowAndHide:nil]里面已经调用了handleRightTrafficBarViewShowOrHide，所以先注释掉
+    
 }
 
 - (void)handleShowModeToLockedCarPosition {
     self.lockCarPosition = YES;
     [self updateBottomInfoView];
     self.bottomContinueNaviBgView.hidden = YES;
-    self.rightSwitchTrafficBtn.hidden = self.zoomInBtn.superview.hidden = YES;
+    self.rightSwitchTrafficBtn.hidden = YES;
+    self.zoomInBtn.superview.hidden = YES;
+    
     self.rightBrowserBtn.hidden = YES;
+//    [self handleRightBrowserBtnShowOrHide];
     
     [self handleRightTrafficBarViewShowOrHide];
     
@@ -740,9 +912,13 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 - (void)handleWhenCrossImageShowAndHide:(UIImage *)crossImage {
     
-    //1.有图，且锁车模式，才显示路口放大图
-    //2.目前有路口放大图，变成非锁车模式后，里面干掉路口放大图
-    if (crossImage && self.showMode == AMapNaviDriveViewShowModeCarPositionLocked) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
+    if (self.showUIElements == NO) {  //如果不显示UI界面，这边就不处理，以便地图一直全屏
+        return;
+    }
+    
+    //1.有图，且锁车模式，且self.showCrossImage = YES，才显示路口放大图
+    //2.目前有路口放大图，变成非锁车模式后，干掉路口放大图
+    if (crossImage && self.showMode == AMapNaviDriveViewShowModeCarPositionLocked && self.showCrossImage) {  //有路口放大图，不管目前是横竖屏，统一都改了，当他切换横竖屏的时候自然好使
         self.crossImageView.image = crossImage;
         self.mapViewTopPortrait.constant = self.topInfoViewHeightInCrossModePortrait.constant;  //竖屏下
         self.mapViewLeftLandscape.constant = self.crossImageViewWidthLandScape.constant;  //横屏下
@@ -838,15 +1014,29 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     [self updateZoomButtonState];
 }
 
-
 - (void)handleRightTrafficBarViewShowOrHide {
     
     //只有在锁车模式，且没有路口放大图，才会有光柱图,其实，现在的逻辑就是锁车，一定不会有路口放大图了，所以 && self.crossImageView.image == nil 有点多余
-    if (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked && self.crossImageView.image == nil) {
+    if (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked && self.crossImageView.image == nil && self.showTrafficBar) {
         self.rightTrafficBarView.hidden = NO;
     } else {
         self.rightTrafficBarView.hidden = YES;
     }
+}
+
+//这个函数目前不使用，隐藏全览按钮，不通过此方法处理，直接改按钮的高度
+- (void)handleRightBrowserBtnShowOrHide {
+    
+    if (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked || self.showBrowseRouteButton == NO) {
+        self.rightBrowserBtn.hidden = YES;
+    } else {
+        self.rightBrowserBtn.hidden = NO;
+    }
+    
+    if (self.showMode == AMapNaviDriveViewShowModeNormal) {
+        self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
+    }
+    
 }
 
 - (void)updateZoomButtonState {
@@ -874,15 +1064,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //切换路况按钮点击
 - (IBAction)swichTrafficBtnClick:(id)sender {
-    UIButton *btn = (UIButton *)sender;
-    
-    if (btn.selected == NO) {  //点击从有路况切成没路况
-        self.showTrafficLayer = NO;
-    } else { //点击从无路况切成有路况
-        self.showTrafficLayer = YES;
-    }
-    
-    btn.selected = !btn.selected;
+    self.showTrafficLayer = !self.showTrafficLayer;
 }
 
 
@@ -964,11 +1146,11 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 ///刚选择路径的时候，画出所有的电子眼，但只是图标
 - (void)updateRouteCameraAnnotationWithStartIndex:(NSInteger)startIndex {
     
-    if (self.currentNaviRoute == nil) {  //没有路径，就无从显示
+    [self removeRouteCameraAnnotation];  //每次更新前，先全部移除所有电子眼
+    
+    if (self.currentNaviRoute == nil || self.showCamera == NO) {  //没有路径，就无从显示
         return;
     }
-    
-    [self removeRouteCameraAnnotation];  //每次更新前，先全部移除所有电子眼
     
     //zoomLevel不在范围内，这里取决于你全览或者放大缩小到一定程度，还是否想看到电子眼图标。
     if (self.internalMapView.zoomLevel > kAMapNaviShowCameraMaxZoomLevel || self.internalMapView.zoomLevel < kAMapNaviShowCameraMinZoomLevel){
@@ -999,6 +1181,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)updateRouteCameraAnnotationWithCameraInfos:(NSArray <AMapNaviCameraInfo *> *)cameraInfos
 {
     [self removeRouteCameraTypeAnnotation];  //如果数组为空，也是先移除，再return回去，因为数组为空，就是代表你刚路过完一个摄像头，要把其从地图上移除
+    
+    if (self.showCamera == NO) {
+        return;
+    }
     
     //zoomLevel不在范围内，这里取决于你全览或者放大缩小到一定程度，还是否想看到电子眼图标。
     if (self.internalMapView.zoomLevel > kAMapNaviShowCameraMaxZoomLevel || self.internalMapView.zoomLevel < kAMapNaviShowCameraMinZoomLevel) {
@@ -1083,7 +1269,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     [self removeRouteTurnArrowPolyline];
     
-    if (self.currentNaviRoute == nil) {
+    if (self.currentNaviRoute == nil || self.showTurnArrow == NO ) {
         return;
     }
     
@@ -1092,7 +1278,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
     
     //如果用户把地图缩放得很小，箭头的宽度还是那么大，覆盖了地图的区域就很大了，不精确了，就没有指导意义了
-    if (self.internalMapView.zoomLevel < kAMapNaviShowTurnArrowMinZoomLevel) {
+    if (self.internalMapView.zoomLevel < kAMapNaviShowTurnArrowMinZoomLevel || self.internalMapView.zoomLevel > kAMapNaviShowTurnArrowMaxZoomLevel) {
         return;
     }
     
@@ -1396,9 +1582,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     //用户利用手势改变地图的摄像机角度，缩放地图，地图的旋转角度，一定会进入非锁车模式
     if (self.lockCarPosition == NO) {
 //        [self resetCarAnnotaionToRightStateAndIsNeedResetMapView:NO]; 这个时候我们要更新一下车的倾斜角度，来保证和地图平面平行，否则很怪。貌似地图5.0.0后，不用处理平行的问题。
+        
+        [self updateRouteTurnArrowPolylineWithSegmentIndex:self.currentNaviInfo.currentSegmentIndex]; //更新turnArrowPolyline
         [self updateRouteCameraAnnotationWithStartIndex:0]; //实现全览或者地图缩放的比较小，摄像头不画，放大到一定程度，又有摄像头
         [self updateRouteCameraAnnotationWithCameraInfos:self.cameraInfos]; //同上
-        
         [self updateZoomButtonState]; //更新zoomButtonState
     }
     

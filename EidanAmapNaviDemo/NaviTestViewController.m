@@ -41,9 +41,9 @@
     
     self.driveManager = [[AMapNaviDriveManager alloc] init];
     [self.driveManager setDelegate:self];
-//    [self.driveManager setEmulatorNaviSpeed:120];
     
     self.driveView.delegate = self;
+//    self.driveView.showTurnArrow = NO;
     
     //将driveView添加为导航数据的Representative，使其可以接收到导航诱导数据
     [self.driveManager addDataRepresentative:self.driveView];
@@ -69,6 +69,13 @@
 - (void)dealloc {
     NSLog(@"------------------ VC dealloc");
 }
+
+- (IBAction)test:(id)sender {
+    self.driveView.showTurnArrow = !self.driveView.showTurnArrow;
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.selected;
+}
+
 
 #pragma mark - AMapNaviDriveViewXDelegate
 

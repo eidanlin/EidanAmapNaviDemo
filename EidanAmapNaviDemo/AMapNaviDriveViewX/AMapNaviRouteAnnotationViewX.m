@@ -10,14 +10,11 @@
 #import <AMapNaviKit/AMapNaviKit.h>
 
 #define kAMapNaviCameraAnnotationViewWidth          22.f
-#define kAMapNaviRoutePointAnnotationWidth          35.f
-#define kAMapNaviRoutePointAnnotationHeight         46.f
-#define kAMapNaviRoutePointAnnotaitonCenterOffset   CGPointMake(0, -18)
 
 #define kAMapNaviCameraAnnotationViewImageName      @"default_navi_route_camera"
-#define kAMapNaviStartPointAnnotationViewImageName  @"default_navi_route_startpoint"
-#define kAMapNaviWayPointAnnotationViewImageName    @"default_navi_route_waypoint"
-#define kAMapNaviEndPointAnnotationViewImageName    @"default_navi_route_endpoint"
+#define kAMapNaviStartPointAnnotationViewImageName  @"default_common_route_startpoint_normal"
+#define kAMapNaviWayPointAnnotationViewImageName    @"default_path_map_midtop_normal"
+#define kAMapNaviEndPointAnnotationViewImageName    @"default_common_route_endpoint_normal_1"
 
 @implementation AMapNaviCameraAnnotationViewX
 
@@ -105,8 +102,8 @@
 - (void)setImage:(UIImage *)image {
     if (image == nil) {
         [super setImage:[UIImage imageNamed:kAMapNaviStartPointAnnotationViewImageName]];
-        self.bounds = CGRectMake(0, 0, kAMapNaviRoutePointAnnotationWidth, kAMapNaviRoutePointAnnotationHeight);
-        self.centerOffset = kAMapNaviRoutePointAnnotaitonCenterOffset;
+        self.bounds = CGRectMake(0, 0, 32, 32);
+        self.centerOffset = CGPointMake(0, -14);
     } else {
         [super setImage:image];
         self.centerOffset = CGPointZero;
@@ -128,8 +125,8 @@
 - (void)setImage:(UIImage *)image {
     if (image == nil) {
         [super setImage:[UIImage imageNamed:kAMapNaviWayPointAnnotationViewImageName]];
-        self.bounds = CGRectMake(0, 0, kAMapNaviRoutePointAnnotationWidth, kAMapNaviRoutePointAnnotationHeight);
-        self.centerOffset = kAMapNaviRoutePointAnnotaitonCenterOffset;
+        self.bounds = CGRectMake(0, 0, 32, 32);
+        self.centerOffset = CGPointMake(0, -14);
     } else {
         [super setImage:image];
         self.centerOffset = CGPointZero;
@@ -152,8 +149,8 @@
 - (void)setImage:(UIImage *)image {
     if (image == nil) {
         [super setImage:[UIImage imageNamed:kAMapNaviEndPointAnnotationViewImageName]];
-        self.bounds = CGRectMake(0, 0, kAMapNaviRoutePointAnnotationWidth, kAMapNaviRoutePointAnnotationHeight);
-        self.centerOffset = kAMapNaviRoutePointAnnotaitonCenterOffset;
+        self.bounds = CGRectMake(0, 0, 32, 32);
+        self.centerOffset = CGPointMake(12, -14);
     } else {
         [super setImage:image];
         self.centerOffset = CGPointZero;

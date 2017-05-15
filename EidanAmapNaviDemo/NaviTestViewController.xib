@@ -50,6 +50,12 @@
                 <constraint firstItem="6r8-cc-Hfk" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="tGX-r8-AEt"/>
                 <constraint firstAttribute="bottom" secondItem="uWe-I9-M4P" secondAttribute="bottom" id="vcn-8K-MwM"/>
             </constraints>
+            <variation key="default">
+                <mask key="subviews">
+                    <exclude reference="7gD-af-sl8"/>
+                    <exclude reference="6r8-cc-Hfk"/>
+                </mask>
+            </variation>
             <point key="canvasLocation" x="-148" y="36"/>
         </view>
     </objects>

@@ -1704,7 +1704,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     polyline.polylineWidth = self.lineWidth;
     
     //polyline.polylineStrokeColors = @[[UIColor blueColor],[UIColor purpleColor],[UIColor orangeColor],[UIColor yellowColor]];
-    polyline.polylineTextureImages = @[[self textureImageWithoutTrafficPolyline]];
+    UIImage *image = [self textureImageWithoutTrafficPolyline];
+    if (image) {
+       polyline.polylineTextureImages = @[image];
+    }
     
     free(coordinates);
     coordinates = NULL;

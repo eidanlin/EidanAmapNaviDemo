@@ -10,7 +10,12 @@
 
 @interface AMapNaviCarAnnotationViewX : MAAnnotationView
 
+@property (nonatomic, assign) BOOL showCompass;
+
 @property (nonatomic, assign) double carDirection;  //车头方向
 @property (nonatomic, assign) double compassDirection; //罗盘正北指的方向
+
+- (void)setCarImage:(nullable UIImage *)carImage;
+- (void)setCompassImage:(nullable UIImage *)compassImage;
 
 @end

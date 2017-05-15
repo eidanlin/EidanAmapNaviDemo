@@ -21,6 +21,25 @@
 
 @implementation AMapNaviCarAnnotationViewX
 
+
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    
+    BOOL inside = [super pointInside:point withEvent:event];
+    
+    if(!inside) {
+        if(self.carImageView) {
+            inside = [self.carImageView pointInside:[self convertPoint:point toView:self.carImageView] withEvent:event];
+        }
+        else if (self.compassImageView) {
+            inside = [self.compassImageView pointInside:[self convertPoint:point toView:self.compassImageView] withEvent:event];
+        }
+    }
+    
+    return inside;
+}
+
+
+
 - (id)initWithAnnotation:(id<MAAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor clearColor];
@@ -34,7 +53,9 @@
 
 - (void)buildCarAnnotationView {
     
-    self.carDirection = 0;
+    _showCompass = YES;
+    _carDirection = 0;
+    _compassDirection = 0;
     
     [self addSubview:self.compassImageView];
     [self addSubview:self.carImageView];
@@ -42,6 +63,7 @@
 
 - (UIImageView *)carImageView {
     if (_carImageView == nil) {
+        
         UIImage *carImage = [UIImage imageNamed:kCarAnnotationViewCarImage];
         
         _carImageView = [[UIImageView alloc] initWithImage:carImage];
@@ -53,6 +75,7 @@
 }
 
 - (UIImageView *)compassImageView {
+    
     if (_compassImageView == nil) {
         UIImage *compassImage = [UIImage imageNamed:kCarAnnotationViewCompassImage];
         
@@ -61,6 +84,14 @@
         
     }
     return _compassImageView;
+}
+
+#pragma mark - Interface
+
+- (void)setShowCompass:(BOOL)showCompass {
+    _showCompass = showCompass;
+    
+    self.compassImageView.hidden = !_showCompass;
 }
 
 - (void)setCarDirection:(double)carDirection {
@@ -83,6 +114,22 @@
 
 - (void)updateCameraDegree {
     self.layer.transform = CATransform3DMakeRotation([[self mapView] cameraDegree] / 180.0 * M_PI, 1, 0, 0);
+}
+
+- (void)setCarImage:(nullable UIImage *)carImage {
+    if (carImage) {
+        [self.carImageView setImage:carImage];
+    } else {
+        [self.carImageView setImage:[UIImage imageNamed:kCarAnnotationViewCarImage]];
+    }
+}
+
+- (void)setCompassImage:(nullable UIImage *)compassImage {
+    if (compassImage) {
+        [self.compassImageView setImage:compassImage];
+    } else {
+        [self.compassImageView setImage:[UIImage imageNamed:kCarAnnotationViewCompassImage]];
+    }
 }
 
 - (MAMapView *)mapView {

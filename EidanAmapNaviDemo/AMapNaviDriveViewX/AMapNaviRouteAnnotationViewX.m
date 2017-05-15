@@ -26,10 +26,17 @@
 - (id)initWithAnnotation:(id<MAAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor clearColor];
-        self.bounds = CGRectMake(0, 0, kAMapNaviCameraAnnotationViewWidth, kAMapNaviCameraAnnotationViewWidth);
-        self.image = [UIImage imageNamed:kAMapNaviCameraAnnotationViewImageName];
     }
     return self;
+}
+
+- (void)setImage:(UIImage *)image {
+    if (image == nil){
+        self.bounds = CGRectMake(0, 0, kAMapNaviCameraAnnotationViewWidth, kAMapNaviCameraAnnotationViewWidth);
+        self.image = [UIImage imageNamed:kAMapNaviCameraAnnotationViewImageName];
+    } else {
+        [super setImage:image];
+    }
 }
 
 
@@ -90,11 +97,20 @@
 {
     if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor clearColor];
-        self.bounds = CGRectMake(0, 0, kAMapNaviRoutePointAnnotationWidth, kAMapNaviRoutePointAnnotationHeight);
-        self.image = [UIImage imageNamed:kAMapNaviStartPointAnnotationViewImageName];
     }
     
     return self;
+}
+
+- (void)setImage:(UIImage *)image {
+    if (image == nil) {
+        [super setImage:[UIImage imageNamed:kAMapNaviStartPointAnnotationViewImageName]];
+        self.bounds = CGRectMake(0, 0, kAMapNaviRoutePointAnnotationWidth, kAMapNaviRoutePointAnnotationHeight);
+        self.centerOffset = kAMapNaviRoutePointAnnotaitonCenterOffset;
+    } else {
+        [super setImage:image];
+        self.centerOffset = CGPointZero;
+    }
 }
 
 @end
@@ -104,7 +120,6 @@
 - (id)initWithAnnotation:(id<MAAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier {
     if (self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier]) {
         self.backgroundColor = [UIColor clearColor];
-        self.image = nil;
     }
     
     return self;

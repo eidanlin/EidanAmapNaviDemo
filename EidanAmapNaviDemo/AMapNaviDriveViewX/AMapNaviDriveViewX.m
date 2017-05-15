@@ -104,6 +104,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //bottomInfoView
 @property (nonatomic, weak) IBOutlet UIView *bottomInfoView;
+@property (nonatomic, weak) IBOutlet UIImageView *bottomBgImageViewPortrait;
+
 @property (nonatomic, weak) IBOutlet UIView *bottomRemainBgView;
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *bottomRemainDistanceLabel;
@@ -118,6 +120,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet UIButton *zoomOutBtn; //缩小
 
 //constraint both
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnHeight;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightBrowserBtnHeight;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightSwitchTrafficBtnHeight;
 
@@ -125,7 +128,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightPortrait;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopPortrait;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *topInfoViewHeightInCrossModePortrait;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnWidthPortrait;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *bottomInfoViewRightPortrait;
 
 
 //constraint landscape
@@ -134,7 +137,16 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *mapViewTopLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewHeightLandscape;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *crossImageViewWidthLandScape;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnHeightLandscape;
+@property (nonatomic, weak) IBOutlet NSLayoutConstraint *rightBrowserBtnBottomLandscape;
+
+//custom image set
+@property (nonatomic, strong) UIImage *cameraImage;
+@property (nonatomic, strong) UIImage *startPointImage;
+@property (nonatomic, strong) UIImage *wayPointImage;
+@property (nonatomic, strong) UIImage *endPointImage;
+@property (nonatomic, strong) UIImage *carImage;
+@property (nonatomic, strong) UIImage *carCompassImage;
+
 
 
 @end
@@ -245,11 +257,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     _showTrafficButton = YES;
     _showTrafficLayer = YES;
     _showTurnArrow = YES;
-    
-    _lineWidth = AMapNaviRoutePolylineDefaultWidth;
+    _showCompass = NO;
     _cameraDegree = kAMapNaviLockStateCameraDegree;
-    
-    
+    _lineWidth = AMapNaviRoutePolylineDefaultWidth;
     
     //car and map move
     self.splitCount = AMapNaviMoveCarSplitCount;
@@ -338,7 +348,14 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
     
     _showBrowseRouteButton = showBrowseRouteButton;
-    self.rightBrowserBtnHeight.constant = showBrowseRouteButton ? 53 : 0;
+    
+    if (showBrowseRouteButton) {
+        self.rightBrowserBtnHeight.constant = 53;
+    } else {
+        self.rightBrowserBtnHeight.constant = 0;
+    }
+    
+    [self handleRightBrowserBtnBottomLandscape];
     
 //    [self handleRightBrowserBtnShowOrHide];
 }
@@ -352,12 +369,15 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     _showMoreButton = showMoreButton;
     
     if (showMoreButton) {
-        self.setMoreBtnWidthPortrait.constant = 49;
-        self.setMoreBtnHeightLandscape.constant = 53;
+        self.bottomInfoViewRightPortrait.constant = 55;
+        self.setMoreBtnHeight.constant = 53;
     } else {
-        self.setMoreBtnWidthPortrait.constant = 0;
-        self.setMoreBtnHeightLandscape.constant = 0;
+        self.bottomInfoViewRightPortrait.constant = 0;
+        self.setMoreBtnHeight.constant = 0;
     }
+    
+    [self handleRightBrowserBtnBottomLandscape];
+    
 }
 
 - (void)setShowTrafficBar:(BOOL)showTrafficBar {
@@ -404,9 +424,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
 }
 
-- (void)setLineWidth:(CGFloat)lineWidth {
-    _lineWidth = lineWidth;
-    [self updateRoutePolyline];  //重绘路径
+- (void)setShowCompass:(BOOL)showCompass {
+    _showCompass = showCompass;
+    self.internalMapView.showsCompass = showCompass;
 }
 
 - (void)setCameraDegree:(CGFloat)cameraDegree {
@@ -418,6 +438,35 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
     
 }
+
+- (CGFloat)mapZoomLevel {
+    return self.internalMapView.zoomLevel;
+}
+
+- (void)setMapZoomLevel:(CGFloat)mapZoomLevel {
+    
+    self.showMode = AMapNaviDriveViewShowModeNormal;  //设置zoomLevel进入非锁车状态
+    
+    [self.internalMapView setZoomLevel:mapZoomLevel animated:YES];
+}
+
+- (BOOL)showScale {
+    return self.internalMapView.showsScale;
+}
+
+- (void)setShowScale:(BOOL)showScale {
+    [self.internalMapView setShowsScale:showScale];
+}
+
+
+- (CGPoint)scaleOrigin {
+    return self.internalMapView.scaleOrigin;
+}
+
+- (void)setScaleOrigin:(CGPoint)scaleOrigin {
+    [self.internalMapView setScaleOrigin:scaleOrigin];
+}
+
 
 - (BOOL)customMapStyleEnabled {
     return self.internalMapView.customMapStyleEnabled;
@@ -432,6 +481,111 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     }
     
     [self.internalMapView setCustomMapStyleEnabled:customMapStyleEnabled];
+}
+
+- (void)setCustomMapStyle:(NSData *)customJson {
+    [self.internalMapView setCustomMapStyle:customJson];
+}
+
+- (void)setCustomCalloutView:(MACustomCalloutView *)customCalloutView {
+    
+    _customCalloutView = customCalloutView;
+    
+    //carAnnotation未添加只保留customCalloutView的设置
+    if (self.carAnnotationView == nil) return;
+    
+    if (_customCalloutView == nil) {
+        [self.carAnnotationView setCustomCalloutView:nil];
+        
+        self.carAnnotationView.enabled = NO;
+        self.carAnnotationView.canShowCallout = NO;
+        [self.internalMapView deselectAnnotation:self.carAnnotation animated:NO];
+    } else {
+        [self.carAnnotationView setCustomCalloutView:_customCalloutView];
+        
+        self.carAnnotationView.enabled = YES;
+        self.carAnnotationView.canShowCallout = YES;
+        [self.internalMapView selectAnnotation:self.carAnnotation animated:NO];
+    }
+}
+
+- (void)setLineWidth:(CGFloat)lineWidth {
+    _lineWidth = (lineWidth <= 0 ? AMapNaviRoutePolylineDefaultWidth : lineWidth);
+    [self updateRoutePolyline];  //重绘路径
+}
+
+- (void)setNormalTexture:(UIImage *)normalTexture {
+    _normalTexture = [normalTexture copy];
+    
+    [self updateRoutePolyline];  //更新RoutePolyline
+}
+
+- (void)setStatusTextures:(NSDictionary<NSNumber *,UIImage *> *)statusTextures {
+    
+    _statusTextures = [statusTextures copy];
+    
+    [self updateRoutePolyline];   //更新RoutePolyline
+}
+
+- (void)setCameraImage:(UIImage *)cameraImage {
+    
+    _cameraImage = cameraImage;
+    
+    [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviCameraAnnotationX class]]) {
+            [[self.internalMapView viewForAnnotation:obj] setImage:_cameraImage];
+        }
+    }];
+}
+
+- (void)setStartPointImage:(UIImage *)startPointImage {
+    
+    _startPointImage = startPointImage;
+    
+    [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviStartPointAnnotationX class]]) {
+            [[self.internalMapView viewForAnnotation:obj] setImage:_startPointImage];
+        }
+    }];
+}
+
+- (void)setWayPointImage:(UIImage *)wayPointImage {
+    _wayPointImage = wayPointImage;
+    
+    [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviWayPointAnnotationX class]]) {
+            [[self.internalMapView viewForAnnotation:obj] setImage:_wayPointImage];
+        }
+    }];
+}
+
+- (void)setEndPointImage:(UIImage *)endPointImage {
+    _endPointImage = endPointImage;
+    
+    [self.internalMapView.annotations enumerateObjectsUsingBlock:^(id<MAAnnotation> obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isKindOfClass:[AMapNaviEndPointAnnotationX class]]) {
+            [[self.internalMapView viewForAnnotation:obj] setImage:_endPointImage];
+        }
+    }];
+}
+
+- (void)setCarImage:(nullable UIImage *)carImage {
+    
+    _carImage = carImage;
+    
+    if (self.carAnnotationView) {
+        [self.carAnnotationView setCarImage:_carImage];
+    }
+}
+
+- (void)setCarCompassImage:(nullable UIImage *)carCompassImage {
+    
+    _carCompassImage = carCompassImage;
+    
+    if (self.carAnnotationView) {
+        [self.carAnnotationView setCompassImage:_carCompassImage];
+    }
+    
 }
 
 #pragma -mark 显示模式切换
@@ -694,15 +848,11 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //导航模式更新，停止导航，开始GPS导航，开始模拟导航，的时候才会调用一次
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviMode:(AMapNaviMode)naviMode {
-//    NSLog(@"导航模式更新");
     self.currentNaviMode = naviMode;
-
 }
 
 //路径信息更新：每次换路后，开始导航的时候才会调用一次(或者两次)，可用来设置这次导航路线的起点，让地图的初始位置正确，电子眼的初始化
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviRoute:(AMapNaviRoute *)naviRoute {
-    
-//    NSLog(@"路径信息更新,%@",naviRoute);
     
     self.currentNaviRoute = naviRoute;
     
@@ -735,7 +885,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //导航实时信息更新，如果是模拟导航，自车位置开始一段时间后，就不再更新，但是导航实时信息一直在更新，所以模拟导航以这个回调为准
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviInfo:(AMapNaviInfo *)naviInfo {
-//    NSLog(@"导航信息更新,%@",naviInfo);
     
     //第一次没有self.currentNaviInfo需要，上一次导航信息的摄像头索引和这次的不一样也需要。
     BOOL isNeedUpdateTurnArrow = self.currentNaviInfo ? (self.currentNaviInfo.currentSegmentIndex != naviInfo.currentSegmentIndex) : YES;
@@ -776,8 +925,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //自车位置更新。模拟导航自车位置不会一直更新，GPS导航自车位置才能一直更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateNaviLocation:(AMapNaviLocation *)naviLocation {
     
-//    NSLog(@"自车位置更新,%@",naviLocation.coordinate);
-    
     self.currentCarLocation = naviLocation;
     
     if (self.carAnnotation == nil) {
@@ -791,7 +938,6 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //路况信息更新
 - (void)driveManager:(AMapNaviDriveManager *)driveManager updateTrafficStatus:(NSArray<AMapNaviTrafficStatus *> *)trafficStatus {
-//    NSLog(@"路况信息更新");
     
     self.trafficStatus = trafficStatus;
     
@@ -890,7 +1036,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.internalMapView.showsScale = NO;
     self.internalMapView.showsIndoorMap = NO;
     self.internalMapView.showsBuildings = NO;
-    self.internalMapView.showsCompass = NO;
+    self.internalMapView.showsCompass = self.showCompass;
     self.internalMapView.maxRenderFrame = 30;
     self.internalMapView.isAllowDecreaseFrame = NO;  //不允许降帧，否则地图一段时间不动的情况下，会被降帧，车的移动就会出现卡顿
     self.internalMapView.delegate = self;
@@ -984,6 +1130,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 - (void)configureBottomInfoView {
     self.bottomRemainBgView.hidden = YES;
     self.bottomContinueNaviBgView.hidden = YES;
+    self.bottomBgImageViewPortrait.image = [[UIImage imageNamed:@"default_navi_bottom_bg"] stretchableImageWithLeftCapWidth:25 topCapHeight:25];
     self.bottomContinueNaviBtnInLandscape.layer.cornerRadius = 3;
 }
 
@@ -1022,6 +1169,21 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     } else {
         self.rightTrafficBarView.hidden = YES;
     }
+}
+
+//当设置全览或者设置按钮的显示与隐藏后，需要调用的
+- (void)handleRightBrowserBtnBottomLandscape {
+    
+    if (self.showMoreButton && self.showBrowseRouteButton) {  //两者都有
+        self.rightBrowserBtnBottomLandscape.constant = 63;
+    } else if (!self.showMoreButton && !self.showBrowseRouteButton) {  //两者都没有
+        self.rightBrowserBtnBottomLandscape.constant = 1;
+    } else if(self.showMoreButton && !self.showBrowseRouteButton){  //有设置，没预览
+        self.rightBrowserBtnBottomLandscape.constant = 55;
+    } else if (!self.showMoreButton && self.showBrowseRouteButton) {  //有预览，没设置
+        self.rightBrowserBtnBottomLandscape.constant = 5;
+    }
+    
 }
 
 //这个函数目前不使用，隐藏全览按钮，不通过此方法处理，直接改按钮的高度
@@ -1458,8 +1620,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             }
             
             //现在开始插入AE`的路况信息，第二个循环插入 E`G`的路况信息
-            UIImage *image = [self defaultTextureImageForRouteStatus:self.trafficStatus[statusesIndex].status]; //AE`的纹理
-            [resultTextureImagesArray addObject:image];
+            UIImage *image = [self textureImageWithTrafficPolyline:self.trafficStatus[statusesIndex].status]; //AE`的纹理
+            if (image) {
+                [resultTextureImagesArray addObject:image];
+            }
             
             //到此，就当AE`不存在了，E` E F G` G又是下一个循环
             sumLength = sumLength + segmenLength - currentTrafficLength; //E`E的长度，这样才能开始新的循环，计算E`E+EF和E`G`的长度关系
@@ -1497,7 +1661,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         }
         
         [resultDrawStyleIndexArray addObject:@(resultCoordinateArray.count - 1)];
-        [resultTextureImagesArray addObject:[self defaultTextureImageForRouteStatus:self.trafficStatus.lastObject.status]];
+        UIImage *image = [self textureImageWithTrafficPolyline:self.trafficStatus.lastObject.status];
+        if (image) {
+            [resultTextureImagesArray addObject:image];
+        }
     }
     
     //画路径线
@@ -1548,9 +1715,16 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //没有交通状态的纹理图片
 - (UIImage *)textureImageWithoutTrafficPolyline {
     
-    UIImage *textureImage = [UIImage imageNamed:AMapNaviRoutePolylineImageDefault];
+    UIImage *textureImage = (self.normalTexture != nil ? self.normalTexture : [UIImage imageNamed:AMapNaviRoutePolylineImageDefault]);
     
     return textureImage;
+}
+
+- (UIImage *)textureImageWithTrafficPolyline:(AMapNaviRouteStatus)routeStatus {
+    
+    UIImage *textureImage = [self.statusTextures objectForKey:@(routeStatus)];
+    
+    return (textureImage != nil ? textureImage : [self defaultTextureImageForRouteStatus:routeStatus]);
 }
 
 //根据交通状态获得纹理图片
@@ -1589,6 +1763,12 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         [self updateZoomButtonState]; //更新zoomButtonState
     }
     
+}
+
+- (void)mapView:(MAMapView *)mapView didDeselectAnnotationView:(MAAnnotationView *)view {
+    if (view == self.carAnnotationView && self.customCalloutView != nil) {
+        [self.internalMapView selectAnnotation:self.carAnnotation animated:NO];
+    }
 }
 
 //覆盖物的属性设置
@@ -1666,6 +1846,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
         self.carAnnotationView.enabled = NO;
         self.carAnnotationView.canShowCallout = NO;
         self.carAnnotationView.draggable = NO;
+        
+        [self setCustomCalloutView:self.customCalloutView];
         
         return self.carAnnotationView;
     } else if ([annotation isKindOfClass:[AMapNaviCameraAnnotationX class]]) {

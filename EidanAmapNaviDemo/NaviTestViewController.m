@@ -43,7 +43,6 @@
     [self.driveManager setDelegate:self];
     
     self.driveView.delegate = self;
-//    self.driveView.showTurnArrow = NO;
     
     //将driveView添加为导航数据的Representative，使其可以接收到导航诱导数据
     [self.driveManager addDataRepresentative:self.driveView];
@@ -71,11 +70,14 @@
 }
 
 - (IBAction)test:(id)sender {
-    self.driveView.showTurnArrow = !self.driveView.showTurnArrow;
+    self.driveView.showScale = !self.driveView.showScale;
     UIButton *btn = (UIButton *)sender;
     btn.selected = !btn.selected;
 }
 
+- (IBAction)test1:(id)sender {
+    self.driveView.mapZoomLevel = 13;
+}
 
 #pragma mark - AMapNaviDriveViewXDelegate
 

@@ -25,10 +25,17 @@
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7gD-af-sl8">
-                    <rect key="frame" x="164" y="318" width="46" height="30"/>
+                    <rect key="frame" x="164" y="219" width="46" height="30"/>
                     <state key="normal" title="Button"/>
                     <connections>
                         <action selector="test:" destination="-1" eventType="touchUpInside" id="1YW-Rs-2ba"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6r8-cc-Hfk">
+                    <rect key="frame" x="164" y="419" width="46" height="30"/>
+                    <state key="normal" title="Button"/>
+                    <connections>
+                        <action selector="test1:" destination="-1" eventType="touchUpInside" id="HM4-3H-mcf"/>
                     </connections>
                 </button>
             </subviews>
@@ -37,8 +44,10 @@
                 <constraint firstItem="7gD-af-sl8" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="8yV-2M-WQP"/>
                 <constraint firstItem="uWe-I9-M4P" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="9Qp-IJ-971"/>
                 <constraint firstItem="uWe-I9-M4P" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="Rks-w4-T81"/>
-                <constraint firstItem="7gD-af-sl8" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="b90-5F-QYJ"/>
+                <constraint firstItem="7gD-af-sl8" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" constant="-100" id="b90-5F-QYJ"/>
+                <constraint firstItem="6r8-cc-Hfk" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" constant="100" id="gpn-6P-nT5"/>
                 <constraint firstAttribute="trailing" secondItem="uWe-I9-M4P" secondAttribute="trailing" id="pCl-Rf-4tW"/>
+                <constraint firstItem="6r8-cc-Hfk" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="tGX-r8-AEt"/>
                 <constraint firstAttribute="bottom" secondItem="uWe-I9-M4P" secondAttribute="bottom" id="vcn-8K-MwM"/>
             </constraints>
             <point key="canvasLocation" x="-148" y="36"/>

@@ -1843,6 +1843,10 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             self.carAnnotationView = [[AMapNaviCarAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:carAnnIdentifier];
         }
         
+        [self.carAnnotationView setZIndex:INT_MAX];
+        [self.carAnnotationView setCarImage:self.carImage];
+        [self.carAnnotationView setCompassImage:self.carCompassImage];
+        
         self.carAnnotationView.enabled = NO;
         self.carAnnotationView.canShowCallout = NO;
         self.carAnnotationView.draggable = NO;
@@ -1859,6 +1863,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             annView = [[AMapNaviCameraAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:cameraAnnIdentifier];
         }
         
+        [annView setImage:_cameraImage];
         annView.enabled = NO;
         annView.canShowCallout = NO;
         annView.draggable = NO;
@@ -1892,6 +1897,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             annView = [[AMapNaviStartPointAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:startAnnIdentifier];
         }
         
+        [annView setImage:_startPointImage];
         annView.enabled = NO;
         annView.canShowCallout = NO;
         annView.draggable = NO;
@@ -1906,6 +1912,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             annView = [[AMapNaviWayPointAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:wayAnnIdentifier];
         }
         
+        [annView setImage:_wayPointImage];
         annView.enabled = NO;
         annView.canShowCallout = NO;
         annView.draggable = NO;
@@ -1921,6 +1928,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
             annView = [[AMapNaviEndPointAnnotationViewX alloc] initWithAnnotation:annotation reuseIdentifier:endAnnIdentifier];
         }
         
+        [annView setImage:_endPointImage];
         annView.enabled = NO;
         annView.canShowCallout = NO;
         annView.draggable = NO;

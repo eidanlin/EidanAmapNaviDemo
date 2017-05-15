@@ -76,7 +76,7 @@
 }
 
 - (IBAction)test1:(id)sender {
-    self.driveView.mapZoomLevel = 13;
+    [self.driveView setCarImage:[UIImage imageNamed:@"default_navi_continue_arrow_normal"]];
 }
 
 #pragma mark - AMapNaviDriveViewXDelegate

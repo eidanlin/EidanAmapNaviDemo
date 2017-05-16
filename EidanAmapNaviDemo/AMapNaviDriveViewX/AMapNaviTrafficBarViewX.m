@@ -116,7 +116,7 @@
     [self.outterBorderLayer removeFromSuperlayer];
     
     //边界要外扩，边界线的内边贴着self这个view的实际区域，外边直接超出了view，这样整个view的高度才是一个有效的总高度，以这个高度来计算百分比，比较方便，不用额外的减边界的宽度
-    float outterBorderWidth = 3;
+    float outterBorderWidth = 4;
     float outterBorderOffset = outterBorderWidth / 2;
     UIBezierPath *outterPath = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(-outterBorderOffset, -outterBorderOffset, self.bounds.size.width + 2 * outterBorderOffset, self.bounds.size.height + 2 * outterBorderOffset) cornerRadius:8];
     

@@ -118,6 +118,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 @property (nonatomic, weak) IBOutlet AMapNaviTrafficBarViewX *rightTrafficBarView;
 @property (nonatomic, weak) IBOutlet UIButton *zoomInBtn;  //放大
 @property (nonatomic, weak) IBOutlet UIButton *zoomOutBtn; //缩小
+@property (nonatomic, weak) IBOutlet UIButton *swtichTrackModeBtn;
+@property (nonatomic, weak) IBOutlet UILabel *speedLabel;
+
 
 //constraint both
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *setMoreBtnHeight;
@@ -635,10 +638,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.bottomContinueNaviBgView.hidden = NO;
     self.rightSwitchTrafficBtn.hidden = NO;
     self.zoomInBtn.superview.hidden = NO;
-    
     self.rightBrowserBtn.hidden = NO;
     self.rightBrowserBtn.selected = NO;  //从锁车模式或者全览模式，点击一下地图，都会切成普通模式，普通模式下，全览按钮就是可见且未被选择的状态
-//    [self handleRightBrowserBtnShowOrHide];
+    self.speedLabel.superview.hidden = YES;
     
     [self handleWhenCrossImageShowAndHide:nil];
     
@@ -650,9 +652,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.bottomContinueNaviBgView.hidden = YES;
     self.rightSwitchTrafficBtn.hidden = YES;
     self.zoomInBtn.superview.hidden = YES;
-    
     self.rightBrowserBtn.hidden = YES;
-//    [self handleRightBrowserBtnShowOrHide];
+    self.speedLabel.superview.hidden = NO;
     
     [self handleRightTrafficBarViewShowOrHide];
     
@@ -927,6 +928,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     self.currentCarLocation = naviLocation;
     
+    self.speedLabel.text = [NSString stringWithFormat:@"%@",naviLocation.speed > 0 ? [NSString stringWithFormat:@"%ld",naviLocation.speed] : @"--"];
+    
     if (self.carAnnotation == nil) {
         return;
     }
@@ -1096,6 +1099,15 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     self.topInfoContainerViewInCrossMode.backgroundColor = kAMapNaviInfoViewBackgroundColor;
     self.topInfoContainerViewInCrossMode.hidden = YES;
+    
+    UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(turnImageViewTap)];
+    UITapGestureRecognizer *tapGes1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(turnImageViewTap)];
+    [self.topTurnImageView addGestureRecognizer:tapGes];
+    [self.topTurnImageViewInCrossMode addGestureRecognizer:tapGes1];
+}
+
+- (void)turnImageViewTap {
+    
 }
 
 - (void)updateTopInfoView {
@@ -1158,6 +1170,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     self.rightBrowserBtn.hidden = YES;
     self.rightSwitchTrafficBtn.hidden = YES;
     self.zoomInBtn.superview.hidden = YES;
+    self.swtichTrackModeBtn.selected = self.trackingMode == AMapNaviViewTrackingModeCarNorth ? NO : YES;
     [self updateZoomButtonState];
 }
 
@@ -1211,13 +1224,22 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 //更多按钮点击
 - (IBAction)moreBtnClick:(id)sender {
 
+}
+
+- (IBAction)switchTrackingMode:(id)sender {
+    
+    UIButton *btn = (UIButton *)sender;
+    
     //更改跟随模式
     if (self.trackingMode == AMapNaviViewTrackingModeMapNorth) {
         self.trackingMode = AMapNaviViewTrackingModeCarNorth;
+        btn.selected = NO;
     } else if (self.trackingMode == AMapNaviViewTrackingModeCarNorth) {
         self.trackingMode = AMapNaviViewTrackingModeMapNorth;
+        btn.selected = YES;
     }
 }
+
 
 //继续导航按钮点击
 - (IBAction)continueNaviBtnClick:(id)sender {

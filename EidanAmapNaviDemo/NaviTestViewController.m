@@ -56,7 +56,7 @@
 - (void)calculateRoute {
     [self.driveManager calculateDriveRouteWithStartPoints:@[self.startPoint]
                                                 endPoints:@[self.endPoint]
-                                                wayPoints:@[[AMapNaviPoint locationWithLatitude:40.00439 longitude:116.478437]]
+                                                wayPoints:nil
                                           drivingStrategy:AMapNaviDrivingStrategySingleDefault];
 }
 

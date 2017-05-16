@@ -28,7 +28,9 @@
 
 @property (nonatomic, assign) float currentHeight;
 
-@property (nonatomic, assign) float lastRemainPercent;
+@property (nonatomic, assign) float posPercent;
+
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, UIColor *> *colors;
 
 @end
 
@@ -59,7 +61,15 @@
     
     //default
     self.currentHeight = self.bounds.size.height;
-    self.lastRemainPercent = 1;
+    self.posPercent = 0;
+    _showCar = YES;
+    
+    //0-未知状态-blue; 1-通畅-green; 2-缓行-yellow; 3-阻塞-red; 4-严重阻塞-brown;
+    self.colors = @{@(AMapNaviRouteStatusUnknow): [self defaultColorForStatus:AMapNaviRouteStatusUnknow],
+                    @(AMapNaviRouteStatusSmooth): [self defaultColorForStatus:AMapNaviRouteStatusSmooth],
+                    @(AMapNaviRouteStatusSlow): [self defaultColorForStatus:AMapNaviRouteStatusSlow],
+                    @(AMapNaviRouteStatusJam): [self defaultColorForStatus:AMapNaviRouteStatusJam],
+                    @(AMapNaviRouteStatusSeriousJam): [self defaultColorForStatus:AMapNaviRouteStatusSeriousJam]}.mutableCopy;
     
     //初始化时候那个蓝色层，随后一闪而过
     self.lightBlueLayer = [CALayer layer];
@@ -87,23 +97,23 @@
     [self addSubview:self.carImageView];
     
     //未知
-    CAShapeLayer *trafficStatusUnknowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(142, 206, 253)];
+    CAShapeLayer *trafficStatusUnknowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:[self getColorWithStatus:AMapNaviRouteStatusUnknow]];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusUnknowLayer];
     
     //顺畅
-    CAShapeLayer *trafficStatusSmoothLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(27, 184, 46)];
+    CAShapeLayer *trafficStatusSmoothLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:[self getColorWithStatus:AMapNaviRouteStatusSmooth]];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSmoothLayer];
     
     //缓慢
-    CAShapeLayer *trafficStatusSlowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(253, 185, 44)];
+    CAShapeLayer *trafficStatusSlowLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:[self getColorWithStatus:AMapNaviRouteStatusSlow]];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSlowLayer];
     
     //堵塞
-    CAShapeLayer *trafficStatusJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(240, 34, 43)];
+    CAShapeLayer *trafficStatusJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:[self getColorWithStatus:AMapNaviRouteStatusJam]];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusJamLayer];
     
     //严重堵塞
-    CAShapeLayer *trafficStatusSeriousJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:AMapNaviTrafficBarViewRGBA(166, 14, 22)];
+    CAShapeLayer *trafficStatusSeriousJamLayer = [self createShapeLayr:self.bounds.size.width andStrokeColor:[self getColorWithStatus:AMapNaviRouteStatusSeriousJam]];
     [self.trafficStatusesContainerLayer addSublayer:trafficStatusSeriousJamLayer];
     
     self.trafficStatusLayerArray = @[trafficStatusUnknowLayer, trafficStatusSmoothLayer, trafficStatusSlowLayer, trafficStatusJamLayer, trafficStatusSeriousJamLayer];
@@ -132,21 +142,51 @@
         self.currentHeight = self.bounds.size.height;
         self.lightBlueLayer.frame = self.bounds;
         [self drawOutterBorder];  //重画
-        [self updateBarWithTrafficStatuses:self.trafficStatus];  //立刻更新色块的位置
-        [self updateCarPositionWithRouteRemainPercent:self.lastRemainPercent];  //立刻更新车的位置
+        [self updateTrafficBarWithTrafficStatuses:self.trafficStatus];  //立刻更新色块的位置
+        [self updateTrafficBarWithCarPositionPercent: self.posPercent];  //立刻更新车的位置
     }
     
 }
 
 #pragma -mark interface
 
-//更新车的位置，然后灰色跟着车，然后路况层的底部是灰色层的顶部
-- (void)updateCarPositionWithRouteRemainPercent:(double)remainPercent {
+- (void)setShowCar:(BOOL)showCar {
     
-    self.lastRemainPercent = MAX(0, MIN(1, remainPercent));
+    _showCar = showCar;
+    
+    self.carImageView.hidden = !showCar;
+}
+
+- (NSDictionary<NSNumber *,UIColor *> *)statusColors {
+    return [self.colors copy];
+}
+
+- (void)setStatusColors:(NSDictionary *)statusColors {
+    
+    for (NSNumber *status in self.colors.allKeys) {
+        
+        UIColor *newColor = [[statusColors objectForKey:status] copy];
+        
+        if (newColor != nil) {
+            [self.colors setObject:newColor forKey:status];
+        } else {
+            [self.colors setObject:[self defaultColorForStatus:status.integerValue] forKey:status];
+        }
+        
+        //改变颜色
+        self.trafficStatusLayerArray[status.intValue].strokeColor = [self getColorWithStatus:status.intValue].CGColor;
+        
+    }
+}
+
+
+//更新车的位置，然后灰色跟着车，然后路况层的底部是灰色层的顶部
+- (void)updateTrafficBarWithCarPositionPercent:(double)posPercent {
+    
+    self.posPercent = MAX(0, MIN(1, posPercent));
     
     //位置再减去1，是因为车的图没切好，离了1个像素的空白，如果顶着边切，就不用减去1
-    self.carImageView.frame = CGRectMake(self.carImageView.frame.origin.x, self.bounds.size.height * self.lastRemainPercent - 1, self.carImageView.frame.size.width, self.carImageView.frame.size.height);
+    self.carImageView.frame = CGRectMake(self.carImageView.frame.origin.x, self.bounds.size.height * (1 - self.posPercent) - 1, self.carImageView.frame.size.width, self.carImageView.frame.size.height);
     
     //+1也是图片没有切好的后遗症，为了不让灰色跑在车前面，灰色要往下微调
     self.greyLayer.frame = CGRectMake(0, self.carImageView.frame.origin.y + 1, self.bounds.size.width, self.bounds.size.height - self.carImageView.frame.origin.y - 1);
@@ -161,7 +201,7 @@
     
 }
 
-- (void)updateBarWithTrafficStatuses:(NSArray <AMapNaviTrafficStatus *> *)trafficStatuses {
+- (void)updateTrafficBarWithTrafficStatuses:(NSArray <AMapNaviTrafficStatus *> *)trafficStatuses {
     
     if (trafficStatuses.count == 0) {
         return;
@@ -218,6 +258,26 @@
     shapeLayer.fillColor = [UIColor clearColor].CGColor;
     shapeLayer.strokeColor = strokeColor.CGColor;
     return shapeLayer;
+}
+
+- (UIColor *)getColorWithStatus:(AMapNaviRouteStatus)status {
+    return [self.colors objectForKey:@(status)];
+}
+
+- (UIColor *)defaultColorForStatus:(AMapNaviRouteStatus)status {
+    
+    switch (status) {
+        case AMapNaviRouteStatusSmooth:     //1-通畅-green
+            return AMapNaviTrafficBarViewRGBA(27, 184, 46);
+        case AMapNaviRouteStatusSlow:       //2-缓行-yellow
+            return AMapNaviTrafficBarViewRGBA(253, 185, 44);
+        case AMapNaviRouteStatusJam:        //3-阻塞-red
+            return AMapNaviTrafficBarViewRGBA(240, 34, 43);
+        case AMapNaviRouteStatusSeriousJam: //4-严重阻塞-brown
+            return AMapNaviTrafficBarViewRGBA(166, 14, 22);
+        default:                            //0-未知状态-blue
+            return AMapNaviTrafficBarViewRGBA(142, 206, 253);
+    }
 }
 
 @end

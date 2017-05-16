@@ -898,8 +898,8 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //更新光柱中车的位置
     if (self.currentNaviRoute.routeLength > 0 && self.currentNaviInfo) {
-        double remainPercent = (double)self.currentNaviInfo.routeRemainDistance / self.currentNaviRoute.routeLength;
-        [self.rightTrafficBarView updateCarPositionWithRouteRemainPercent:remainPercent];
+        double posPercent = 1 - (double)self.currentNaviInfo.routeRemainDistance / self.currentNaviRoute.routeLength;
+        [self.rightTrafficBarView updateTrafficBarWithCarPositionPercent:posPercent];
     }
     
     //每路过一个转弯，“导航信息更新”这个回调就会被触发调用一次，currentSegmentIndex也会不一样，就需要更新转弯信息，每一个Segment就是一个个转弯分割的
@@ -946,7 +946,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //更新光柱中的路况信息
     if (trafficStatus) {
-        [self.rightTrafficBarView updateBarWithTrafficStatuses:trafficStatus];
+        [self.rightTrafficBarView updateTrafficBarWithTrafficStatuses:trafficStatus];
     }
     
     [self updateRoutePolyline]; //如果路况信息更新了，就要重画

@@ -249,7 +249,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //public
     _trackingMode = AMapNaviViewTrackingModeCarNorth;
-    self.showMode = AMapNaviRideViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
+    self.showMode = AMapNaviDriveViewShowModeCarPositionLocked; //默认锁车模式，此时lockCarPosition为YES
     _showUIElements = YES;
     _showCamera = YES;
     _showCrossImage = YES;
@@ -610,7 +610,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     //最后要实现的效果就是，判断这次的点击，是否在地图范围内，没有被其他视图遮挡
     if (CGRectContainsPoint(frame, point)) {
-        self.showMode = AMapNaviRideViewShowModeNormal;
+        self.showMode = AMapNaviDriveViewShowModeNormal;
     }
     
 }
@@ -623,11 +623,11 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     _showMode = showMode;
     
-    if (showMode == AMapNaviRideViewShowModeNormal) {
+    if (showMode == AMapNaviDriveViewShowModeNormal) {
         [self handleShowModeToNormal];
-    } else if (showMode == AMapNaviRideViewShowModeCarPositionLocked) {
+    } else if (showMode == AMapNaviDriveViewShowModeCarPositionLocked) {
         [self handleShowModeToLockedCarPosition];
-    } else if (showMode == AMapNaviRideViewShowModeOverview) {
+    } else if (showMode == AMapNaviDriveViewShowModeOverview) {
         [self handleShowModeToOverview];
     }
 }
@@ -1147,7 +1147,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 }
 
 - (void)updateBottomInfoView {
-    if (self.currentNaviInfo && (self.showMode == AMapNaviRideViewShowModeCarPositionLocked || self.showMode == AMapNaviRideViewShowModeOverview)) {  //如果不是锁车状态或者全览模式，bottomRemainBgView不应该显示
+    if (self.currentNaviInfo && (self.showMode == AMapNaviDriveViewShowModeCarPositionLocked || self.showMode == AMapNaviDriveViewShowModeOverview)) {  //如果不是锁车状态或者全览模式，bottomRemainBgView不应该显示
         
         self.bottomRemainTimeLabel.text = [AMapNaviViewUtilityX normalizedRemainTime:self.currentNaviInfo.routeRemainTime];
         self.bottomRemainDistanceLabel.text = [AMapNaviViewUtilityX normalizedRemainDistance:self.currentNaviInfo.routeRemainDistance];
@@ -1243,7 +1243,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
 
 //继续导航按钮点击
 - (IBAction)continueNaviBtnClick:(id)sender {
-    self.showMode = AMapNaviRideViewShowModeCarPositionLocked;  //切换成锁车模式
+    self.showMode = AMapNaviDriveViewShowModeCarPositionLocked;  //切换成锁车模式
 }
 
 //切换路况按钮点击
@@ -1257,9 +1257,9 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     UIButton *btn = (UIButton *)sender;
     
     if (btn.selected == NO) {  //点击从普通模式切换成全览模式
-        self.showMode = AMapNaviRideViewShowModeOverview;
+        self.showMode = AMapNaviDriveViewShowModeOverview;
     } else { //点击从全览模式切换成锁车模式
-        self.showMode = AMapNaviRideViewShowModeCarPositionLocked;
+        self.showMode = AMapNaviDriveViewShowModeCarPositionLocked;
     }
     
     btn.selected = !btn.selected;
@@ -1506,7 +1506,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     for (NSInteger i = curSegCoor.count - 1; i > 0; i --) {  //离路口越来越远的点
         
-        double dis = [AMapNaviViewUtilityX calcDistanceBetweenPoint:curSegCoor[i] andPoint:curSegCoor[i - 1]];
+        double dis = [AMapNaviViewUtilityX distanceBetweenCoordinates:curSegCoor[i] andPoint:curSegCoor[i - 1]];
         
         if (curSegmentLength + dis > kAMapNaviTurnArrowDistance) {  //如果curSegmentLength已经为30米，这次的dis为15米，那么就为45米，那我们找到40米的那个经纬度添加进数组后，就可以break
             
@@ -1531,7 +1531,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     for (NSInteger i = 0; i < nextSegCoor.count - 1; i ++) {
         
-        double dis = [AMapNaviViewUtilityX calcDistanceBetweenPoint:nextSegCoor[i] andPoint:nextSegCoor[i + 1]];
+        double dis = [AMapNaviViewUtilityX distanceBetweenCoordinates:nextSegCoor[i] andPoint:nextSegCoor[i + 1]];
         
         if (nextSegmentLength + dis > kAMapNaviTurnArrowDistance) {
             
@@ -1613,7 +1613,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     for (; i < oriCoordinateArray.count ; i ++) {
         
-        double segmenLength = [AMapNaviViewUtilityX calcDistanceBetweenPoint:oriCoordinateArray[i - 1] andPoint:oriCoordinateArray[i]]; //A到B的长度，B到C，C到D，D到E,第二个循环：E到F,F到G
+        double segmenLength = [AMapNaviViewUtilityX distanceBetweenCoordinates:oriCoordinateArray[i - 1] andPoint:oriCoordinateArray[i]]; //A到B的长度，B到C，C到D，D到E,第二个循环：E到F,F到G
         
         if (sumLength + segmenLength >= currentTrafficLength) { //A到E的长度大于A到E`的长度，即E`在E前面，那么先算出E`，插入进去，再插入E。第二个循环E`G的长度大于E`G`的长度，先算出G`
             

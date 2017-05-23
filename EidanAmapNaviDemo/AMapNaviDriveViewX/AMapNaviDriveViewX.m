@@ -928,7 +928,7 @@ static NSString *const AMapNaviInfoViewTurnIconImage =  @"default_navi_action_%l
     
     self.currentCarLocation = naviLocation;
     
-    self.speedLabel.text = [NSString stringWithFormat:@"%@",naviLocation.speed > 0 ? [NSString stringWithFormat:@"%ld",naviLocation.speed] : @"--"];
+    self.speedLabel.text = [NSString stringWithFormat:@"%@",naviLocation.speed > 0 ? [NSString stringWithFormat:@"%ld",(unsigned long)naviLocation.speed] : @"--"];
     
     if (self.carAnnotation == nil) {
         return;

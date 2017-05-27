@@ -13,7 +13,7 @@
 
 @interface AMapNaviDriveViewX : UIView <AMapNaviDriveDataRepresentable>
 
-@property (nonatomic, weak) id<AMapNaviDriveViewXDelegate> delegate;
+@property (nonatomic, weak, nullable) id<AMapNaviDriveViewXDelegate> delegate;
 
 #pragma mark - Options
 
@@ -77,7 +77,7 @@
  * @brief 自定义当前地图样式, 目前仅支持自定义标准类型. 默认不生效，调用customMapStyleEnabled=YES使生效. since 5.1.0
  * @param customJson 自定义的JSON格式数据.
  */
-- (void)setCustomMapStyle:(NSData *)customJson;
+- (void)setCustomMapStyle:(NSData *_Nullable)customJson;
 
 ///自定义导航界面自车图标的弹出框view, 设置为nil取消弹框. 注意:弹框功能同MAAnnotationView的customCalloutView, 弹框不会触发 mapView:didAnnotationViewCalloutTapped: 方法. since 5.1.0
 @property (nonatomic, strong, nullable) MACustomCalloutView *customCalloutView;
@@ -151,6 +151,6 @@
 /**
  * @brief 导航界面关闭按钮点击时的回调函数
  */
-- (void)driveViewXCloseButtonClicked:(AMapNaviDriveViewX *)driveView;
+- (void)driveViewXCloseButtonClicked:(AMapNaviDriveViewX *_Nullable)driveView;
 
 @end
